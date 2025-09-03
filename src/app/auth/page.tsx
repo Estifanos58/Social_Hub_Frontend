@@ -1,18 +1,17 @@
 "use client";
 import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation } from "@apollo/client/react";
 import { REGISTER_USER } from "@/graphql/mutations/Register";
+import { LOGIN_USER } from "@/graphql/mutations/LoginUser";
 import { SignUp, Login } from "@/validator/Auth.validator";
 import { z } from "zod";
-import { LOGIN_USER } from "@/graphql/mutations/LoginUser";
 import { LoginMutation, RegisterMutation } from "@/gql/graphql";
 import { useUserStore } from "@/store/userStore";
 import { toast } from "react-toastify";
-import GoogleOAuth from "@/components/custom/GoogleOAuth";
+import LoginForm from "@/components/custom/LoginForm";
+import SignUpForm from "@/components/custom/SignUpForm";
+import GoogleOAuth from "@/components/shared/GoogleOAuth";
 
 const initialState = {
   firstname: "",
@@ -34,12 +33,12 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState(initialErrorState);
-  const {user, setUser} = useUserStore()
+  const { setUser } = useUserStore();
+
   const [registerUser, { loading: registerLoading }] =
     useMutation<RegisterMutation>(REGISTER_USER);
-  const [loginUser, { loading: loginLoading }] = useMutation<LoginMutation>(LOGIN_USER);
-  console.log("API_URL", process.env.NEXT_PUBLIC_API_URL);
-
+  const [loginUser, { loading: loginLoading }] =
+    useMutation<LoginMutation>(LOGIN_USER);
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +52,6 @@ export default function AuthPage() {
   // Validate form on submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting form with data:", formData);
     setErrors(initialErrorState);
 
     try {
@@ -61,38 +59,40 @@ export default function AuthPage() {
 
       if (!isLogin) {
         validatedData = SignUp.parse(formData);
-        console.log("Validated signup data:", validatedData);
+
         await registerUser({
           variables: {
-              firstname: validatedData.firstname,
-              lastname: validatedData.lastname,
-              email: validatedData.email,
-              password: validatedData.password,
+            firstname: validatedData.firstname,
+            lastname: validatedData.lastname,
+            email: validatedData.email,
+            password: validatedData.password,
           },
           onCompleted: (data: any) => {
-          if (data?.register.user)
-            setUser(data.register.user);
-            toast.success("Registration successful!");
-            console.log("Registered user:", data.register.user);
-        },
+            if (data?.register.user) {
+              setUser(data.register.user);
+              toast.success("Registration successful!");
+            }
+          },
         }).catch((err) => {
-        console.log(err.graphQLErrors, "ERROR")
-        toast.error(err.message || "Registration failed");
-      });
+          console.log(err.graphQLErrors, "ERROR");
+          toast.error(err.message || "Registration failed");
+        });
       } else {
         validatedData = Login.parse(formData);
+
         await loginUser({
           variables: {
             email: validatedData.email,
             password: validatedData.password,
           },
           onCompleted: (data: any) => {
-            if (data?.login.user)
-              toast.success("Login successful!");
+            if (data?.login.user) {
               setUser(data.login.user);
-          }
+              toast.success("Login successful!");
+            }
+          },
         }).catch((err) => {
-          console.log(err.graphQLErrors, "ERROR")
+          console.log(err.graphQLErrors, "ERROR");
           toast.error(err.message || "Login failed");
         });
       }
@@ -100,16 +100,16 @@ export default function AuthPage() {
       if (err instanceof z.ZodError) {
         const fieldErrors: any = {};
         err.issues.forEach((e) => {
-          if(e.path[0]) {
-            fieldErrors[e.path[0]] = e.message
+          if (e.path[0]) {
+            fieldErrors[e.path[0]] = e.message;
           }
-        })
+        });
         setErrors((prev) => ({ ...prev, ...fieldErrors }));
       }
     }
   };
 
-  const loading  = isLogin ? loginLoading : registerLoading;
+  const loading = isLogin ? loginLoading : registerLoading;
 
   return (
     <div className="flex min-h-screen bg-gray-100 items-center justify-center p-4">
@@ -157,121 +157,40 @@ export default function AuthPage() {
             )}
           </p>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            {!isLogin && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label>First Name</Label>
-                  <Input
-                    name="firstname"
-                    placeholder="John"
-                    value={formData.firstname}
-                    onChange={handleChange}
-                  />
-                  {errors.firstname && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.firstname}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label>Last Name</Label>
-                  <Input
-                    name="lastname"
-                    placeholder="Doe"
-                    value={formData.lastname}
-                    onChange={handleChange}
-                  />
-                  {errors.lastname && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.lastname}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
+          {/* Render Login or SignUp */}
+          {isLogin ? (
+            <LoginForm
+              formData={formData}
+              errors={errors}
+              handleChange={handleChange}
+              handleSubmit={handleSubmit}
+              loading={loading}
+            />
+          ) : (
+            <SignUpForm
+              formData={formData}
+              errors={errors}
+              handleChange={handleChange}
+              setFormData={setFormData}
+              handleSubmit={handleSubmit}
+              loading={loading}
+            />
+          )}
 
-            <div>
-              <Label>Email Address</Label>
-              <Input
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                value={formData.email}
-                onChange={handleChange}
-              />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-              )}
-            </div>
-
-            <div>
-              <Label>Password</Label>
-              <Input
-                name="password"
-                type="password"
-                placeholder="********"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-              )}
-            </div>
-
-            {!isLogin && (
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  name="terms"
-                  id="terms"
-                  checked={formData.terms}
-                  onCheckedChange={(checked: boolean) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      terms: checked,
-                    }))
-                  }
-                />
-                <label
-                  htmlFor="terms"
-                  className="text-sm text-gray-600 cursor-pointer"
-                >
-                  I agree to the{" "}
-                  <a href="#" className="text-blue-600 hover:underline">
-                    Terms & Conditions
-                  </a>
-                </label>
-              </div>
-            )}
-            {errors.terms && (
-              <p className="text-red-500 text-xs mt-1">{errors.terms}</p>
-            )}
-
-            <Button
-              type="submit"
-              className="w-full bg-black hover:bg-gray-800 text-white"
-              disabled={loading}              
-            >
-              { loading
-                ? "Processing..."
-                : isLogin
-                ? "Log In"
-                : "Create Account"}
-            </Button>
-          </form>
-
+          {/* Divider */}
           <div className="mt-6 flex items-center gap-2">
             <div className="flex-grow border-t border-gray-300" />
             <span className="text-sm text-gray-400">or</span>
             <div className="flex-grow border-t border-gray-300" />
           </div>
 
+          {/* Social Logins */}
           <div className="mt-4 flex gap-3">
             <Button
               variant="outline"
               className="w-full flex items-center justify-center gap-2"
             >
-              <GoogleOAuth/>
+              <GoogleOAuth />
               Continue with Google
             </Button>
             <Button
