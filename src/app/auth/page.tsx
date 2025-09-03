@@ -10,6 +10,9 @@ import { SignUp, Login } from "@/validator/Auth.validator";
 import { z } from "zod";
 import { LOGIN_USER } from "@/graphql/mutations/LoginUser";
 import { LoginMutation, RegisterMutation } from "@/gql/graphql";
+import { useUserStore } from "@/store/userStore";
+import { toast } from "react-toastify";
+import GoogleOAuth from "@/components/custom/GoogleOAuth";
 
 const initialState = {
   firstname: "",
@@ -31,6 +34,7 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState(initialErrorState);
+  const {user, setUser} = useUserStore()
   const [registerUser, { loading: registerLoading }] =
     useMutation<RegisterMutation>(REGISTER_USER);
   const [loginUser, { loading: loginLoading }] = useMutation<LoginMutation>(LOGIN_USER);
@@ -67,20 +71,30 @@ export default function AuthPage() {
           },
           onCompleted: (data: any) => {
           if (data?.register.user)
+            setUser(data.register.user);
+            toast.success("Registration successful!");
             console.log("Registered user:", data.register.user);
         },
         }).catch((err) => {
         console.log(err.graphQLErrors, "ERROR")
+        toast.error(err.message || "Registration failed");
       });
       } else {
         validatedData = Login.parse(formData);
         await loginUser({
           variables: {
             email: validatedData.email,
-            lastname: validatedData.password,
+            password: validatedData.password,
           },
+          onCompleted: (data: any) => {
+            if (data?.login.user)
+              toast.success("Login successful!");
+              setUser(data.login.user);
+          }
+        }).catch((err) => {
+          console.log(err.graphQLErrors, "ERROR")
+          toast.error(err.message || "Login failed");
         });
-        console.log("Login with:", validatedData);
       }
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -257,11 +271,7 @@ export default function AuthPage() {
               variant="outline"
               className="w-full flex items-center justify-center gap-2"
             >
-              <img
-                src="https://www.svgrepo.com/show/475656/google-color.svg"
-                alt="Google"
-                className="w-4 h-4"
-              />
+              <GoogleOAuth/>
               Continue with Google
             </Button>
             <Button
