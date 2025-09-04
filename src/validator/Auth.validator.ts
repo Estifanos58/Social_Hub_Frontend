@@ -11,3 +11,18 @@ export const Login = z.object({
     email: z.email('Invalid email address'),
     password: z.string().min(6, 'Password should be at least 6 characters long'),
 })
+
+export const EmailSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+export const ResetPasswordSchema = z
+  .object({
+    code: z.string().min(6, "Code must be 6 digits"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(6, "Confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });

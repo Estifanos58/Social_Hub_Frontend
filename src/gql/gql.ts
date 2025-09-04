@@ -14,12 +14,18 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\nmutation Login($email: String!, $password: String!) {\n    login(loginInput: {email: $email, password: $password}) {\n        id\n        email\n        firstname\n        avatarUrl\n    }\n}": typeof types.LoginDocument,
+    "\n  mutation Login($email: String!, $password: String!) {\n    login(loginInput: { email: $email, password: $password }) {\n      user {\n        id\n        email\n        firstname\n        avatarUrl\n      }\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Register(\n    $firstname: String!\n    $lastname: String!\n    $email: String!\n    $password: String!\n  ) {\n    register(\n      registerInput: {\n        email: $email\n        firstname: $firstname\n        lastname: $lastname\n        password: $password\n      }\n    ) {\n      user {\n        id\n        firstname\n        email\n      }\n    }\n  }\n": typeof types.RegisterDocument,
+    "\n      mutation ResetPassword(\n        $token: String!, \n        $newPassword: String!\n        ) {\n    resetPassword(\n        token: $token, \n        newPassword: $newPassword\n        ) {\n        user {\n            id\n            firstname\n            email\n            bio\n            avatarUrl\n        }\n    }\n  }\n": typeof types.ResetPasswordDocument,
+    "\n    mutation SendResetCode($email: String!) {\n        forgotPassword(email: $email) \n    }\n": typeof types.SendResetCodeDocument,
+    "\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n": typeof types.VerifyEmailDocument,
 };
 const documents: Documents = {
-    "\nmutation Login($email: String!, $password: String!) {\n    login(loginInput: {email: $email, password: $password}) {\n        id\n        email\n        firstname\n        avatarUrl\n    }\n}": types.LoginDocument,
+    "\n  mutation Login($email: String!, $password: String!) {\n    login(loginInput: { email: $email, password: $password }) {\n      user {\n        id\n        email\n        firstname\n        avatarUrl\n      }\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Register(\n    $firstname: String!\n    $lastname: String!\n    $email: String!\n    $password: String!\n  ) {\n    register(\n      registerInput: {\n        email: $email\n        firstname: $firstname\n        lastname: $lastname\n        password: $password\n      }\n    ) {\n      user {\n        id\n        firstname\n        email\n      }\n    }\n  }\n": types.RegisterDocument,
+    "\n      mutation ResetPassword(\n        $token: String!, \n        $newPassword: String!\n        ) {\n    resetPassword(\n        token: $token, \n        newPassword: $newPassword\n        ) {\n        user {\n            id\n            firstname\n            email\n            bio\n            avatarUrl\n        }\n    }\n  }\n": types.ResetPasswordDocument,
+    "\n    mutation SendResetCode($email: String!) {\n        forgotPassword(email: $email) \n    }\n": types.SendResetCodeDocument,
+    "\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n": types.VerifyEmailDocument,
 };
 
 /**
@@ -39,11 +45,23 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\nmutation Login($email: String!, $password: String!) {\n    login(loginInput: {email: $email, password: $password}) {\n        id\n        email\n        firstname\n        avatarUrl\n    }\n}"): (typeof documents)["\nmutation Login($email: String!, $password: String!) {\n    login(loginInput: {email: $email, password: $password}) {\n        id\n        email\n        firstname\n        avatarUrl\n    }\n}"];
+export function graphql(source: "\n  mutation Login($email: String!, $password: String!) {\n    login(loginInput: { email: $email, password: $password }) {\n      user {\n        id\n        email\n        firstname\n        avatarUrl\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation Login($email: String!, $password: String!) {\n    login(loginInput: { email: $email, password: $password }) {\n      user {\n        id\n        email\n        firstname\n        avatarUrl\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation Register(\n    $firstname: String!\n    $lastname: String!\n    $email: String!\n    $password: String!\n  ) {\n    register(\n      registerInput: {\n        email: $email\n        firstname: $firstname\n        lastname: $lastname\n        password: $password\n      }\n    ) {\n      user {\n        id\n        firstname\n        email\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation Register(\n    $firstname: String!\n    $lastname: String!\n    $email: String!\n    $password: String!\n  ) {\n    register(\n      registerInput: {\n        email: $email\n        firstname: $firstname\n        lastname: $lastname\n        password: $password\n      }\n    ) {\n      user {\n        id\n        firstname\n        email\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n      mutation ResetPassword(\n        $token: String!, \n        $newPassword: String!\n        ) {\n    resetPassword(\n        token: $token, \n        newPassword: $newPassword\n        ) {\n        user {\n            id\n            firstname\n            email\n            bio\n            avatarUrl\n        }\n    }\n  }\n"): (typeof documents)["\n      mutation ResetPassword(\n        $token: String!, \n        $newPassword: String!\n        ) {\n    resetPassword(\n        token: $token, \n        newPassword: $newPassword\n        ) {\n        user {\n            id\n            firstname\n            email\n            bio\n            avatarUrl\n        }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    mutation SendResetCode($email: String!) {\n        forgotPassword(email: $email) \n    }\n"): (typeof documents)["\n    mutation SendResetCode($email: String!) {\n        forgotPassword(email: $email) \n    }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

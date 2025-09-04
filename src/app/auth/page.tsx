@@ -112,100 +112,83 @@ export default function AuthPage() {
   const loading = isLogin ? loginLoading : registerLoading;
 
   return (
-    <div className="flex min-h-screen bg-gray-100 items-center justify-center p-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-5xl bg-white rounded-2xl shadow-lg overflow-hidden">
-        {/* Left side (Image) */}
-        <div className="relative hidden md:flex items-center justify-center bg-black">
+    <div className="flex flex-col justify-center p-8 md:p-12">
+      <h2 className="text-3xl font-semibold mb-2">
+        {isLogin ? "Login to Your Account" : "Create an Account"}
+      </h2>
+      <p className="text-sm text-gray-500 mb-6">
+        {isLogin ? (
+          <>
+            Don't have an account?{" "}
+            <button
+              type="button"
+              onClick={() => setIsLogin(false)}
+              className="text-blue-600 hover:underline"
+            >
+              Sign Up
+            </button>
+          </>
+        ) : (
+          <>
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => setIsLogin(true)}
+              className="text-blue-600 hover:underline"
+            >
+              Log in
+            </button>
+          </>
+        )}
+      </p>
+
+      {/* Render Login or SignUp */}
+      {isLogin ? (
+        <LoginForm
+          formData={formData}
+          errors={errors}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          loading={loading}
+        />
+      ) : (
+        <SignUpForm
+          formData={formData}
+          errors={errors}
+          handleChange={handleChange}
+          setFormData={setFormData}
+          handleSubmit={handleSubmit}
+          loading={loading}
+        />
+      )}
+
+      {/* Divider */}
+      <div className="mt-6 flex items-center gap-2">
+        <div className="flex-grow border-t border-gray-300" />
+        <span className="text-sm text-gray-400">or</span>
+        <div className="flex-grow border-t border-gray-300" />
+      </div>
+
+      {/* Social Logins */}
+      <div className="mt-4 flex gap-3">
+        <Button
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2"
+        >
+          <GoogleOAuth />
+          Continue with Google
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2"
+        >
           <img
-            src="https://images.unsplash.com/photo-1622675363315-1f3b209d2ca1?q=80&w=1200"
-            alt="Futuristic VR"
-            className="w-full h-full object-cover"
+            src="https://www.svgrepo.com/show/475647/facebook-color.svg"
+            alt="Facebook"
+            className="w-4 h-4"
           />
-          <div className="absolute top-4 left-4">
-            <span className="text-white font-bold text-2xl">🦋</span>
-          </div>
-        </div>
-
-        {/* Right side (Form) */}
-        <div className="flex flex-col justify-center p-8 md:p-12">
-          <h2 className="text-3xl font-semibold mb-2">
-            {isLogin ? "Login to Your Account" : "Create an Account"}
-          </h2>
-          <p className="text-sm text-gray-500 mb-6">
-            {isLogin ? (
-              <>
-                Don't have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => setIsLogin(false)}
-                  className="text-blue-600 hover:underline"
-                >
-                  Sign Up
-                </button>
-              </>
-            ) : (
-              <>
-                Already have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => setIsLogin(true)}
-                  className="text-blue-600 hover:underline"
-                >
-                  Log in
-                </button>
-              </>
-            )}
-          </p>
-
-          {/* Render Login or SignUp */}
-          {isLogin ? (
-            <LoginForm
-              formData={formData}
-              errors={errors}
-              handleChange={handleChange}
-              handleSubmit={handleSubmit}
-              loading={loading}
-            />
-          ) : (
-            <SignUpForm
-              formData={formData}
-              errors={errors}
-              handleChange={handleChange}
-              setFormData={setFormData}
-              handleSubmit={handleSubmit}
-              loading={loading}
-            />
-          )}
-
-          {/* Divider */}
-          <div className="mt-6 flex items-center gap-2">
-            <div className="flex-grow border-t border-gray-300" />
-            <span className="text-sm text-gray-400">or</span>
-            <div className="flex-grow border-t border-gray-300" />
-          </div>
-
-          {/* Social Logins */}
-          <div className="mt-4 flex gap-3">
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-            >
-              <GoogleOAuth />
-              Continue with Google
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-            >
-              <img
-                src="https://www.svgrepo.com/show/475647/facebook-color.svg"
-                alt="Facebook"
-                className="w-4 h-4"
-              />
-              Continue with Facebook
-            </Button>
-          </div>
-        </div>
+          Continue with Facebook
+        </Button>
       </div>
     </div>
   );
