@@ -5,15 +5,17 @@ import { toast } from "react-toastify";
 import { useMutation } from "@apollo/client/react";
 import { email, z } from "zod";
 import InputField from "@/components/shared/InputField";
-import { SEND_RESET_CODE } from "@/graphql/mutations/sendresetcode";
-import { RESET_PASSWORD } from "@/graphql/mutations/resetpassword";
 import { EmailSchema, ResetPasswordSchema } from "@/validator/Auth.validator";
+import { SEND_RESET_CODE } from "@/graphql/mutations/Sendresetcode";
+import { RESET_PASSWORD } from "@/graphql/mutations/Resetpassword";
+import { useUserStore } from "@/store/userStore";
 
 
 
 
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState<"email" | "reset">("email");
+  const {user , setUser } = useUserStore()
   const [formData, setFormData] = useState<any>({
     email: "",
     code: "",
@@ -46,7 +48,7 @@ export default function ForgotPasswordPage() {
       await sendResetCode({
         variables: { email: formData.email },
         onCompleted: (data: any) => {
-          if (data?.sendResetCode?.user) {
+          if (data?.forgotPassword) {
             toast.success("📩 Reset code sent to your email");
             setStep("reset");
           } else {
@@ -82,12 +84,12 @@ export default function ForgotPasswordPage() {
     try {
       await resetPassword({
         variables: {
-          email: formData.email,
-          code: formData.code,
-          password: formData.password,
+          token: formData.code,
+          newPassword: formData.password,
         },
         onCompleted: (data:any) => {
-          if (data?.resetPassword?.success) {
+          if (data?.resetPassword.user) {
+            setUser(data.resetPassword.user)
             toast.success("✅ Password reset successfully!");
             // redirect to login maybe
           } else {
@@ -117,7 +119,7 @@ export default function ForgotPasswordPage() {
               onChange={handleChange}
               error={errors.email}
             />
-            <Button type="submit" className="w-full" disabled={sending}>
+            <Button type="submit" className="w-full rounded-4xl p-3 h-10" disabled={sending}>
               {sending ? "Sending..." : "Send Code"}
             </Button>
           </form>

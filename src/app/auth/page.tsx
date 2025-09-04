@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import LoginForm from "@/components/custom/LoginForm";
 import SignUpForm from "@/components/custom/SignUpForm";
 import GoogleOAuth from "@/components/shared/GoogleOAuth";
+import { useRouter } from "next/navigation";
 
 const initialState = {
   firstname: "",
@@ -33,6 +34,7 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState(initialErrorState);
+  const navigate = useRouter();
   const { setUser } = useUserStore();
 
   const [registerUser, { loading: registerLoading }] =
@@ -70,6 +72,7 @@ export default function AuthPage() {
           onCompleted: (data: any) => {
             if (data?.register.user) {
               setUser(data.register.user);
+              navigate.push("/auth/verify");
               toast.success("Registration successful!");
             }
           },
@@ -170,24 +173,18 @@ export default function AuthPage() {
       </div>
 
       {/* Social Logins */}
-      <div className="mt-4 flex gap-3">
+      <div className="mt-4 space-y-3 w-full">
+        <GoogleOAuth />
         <Button
           variant="outline"
-          className="w-full flex items-center justify-center gap-2"
-        >
-          <GoogleOAuth />
-          Continue with Google
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full flex items-center justify-center gap-2"
+          className="w-full flex items-center justify-center gap-2 py-2"
         >
           <img
             src="https://www.svgrepo.com/show/475647/facebook-color.svg"
             alt="Facebook"
-            className="w-4 h-4"
+            className="w-5 h-5"
           />
-          Continue with Facebook
+          <span className="text-sm font-medium">Continue with Facebook</span>
         </Button>
       </div>
     </div>

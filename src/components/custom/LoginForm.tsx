@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import InputField from "../shared/InputField";
+import { useRouter } from "next/navigation";
 
 interface LoginFormProps {
   formData: any;
@@ -18,6 +19,8 @@ export default function LoginForm({
   handleSubmit,
   loading,
 }: LoginFormProps) {
+  const navigate = useRouter();
+
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <InputField
@@ -38,11 +41,23 @@ export default function LoginForm({
         value={formData.password}
         onChange={handleChange}
         error={errors.password}
+        togglePassword // 👈 enables eye toggle
       />
+
+      {/* Forgot Password link */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => navigate.push("/auth/resetpassword")}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          Forgot password?
+        </button>
+      </div>
 
       <Button
         type="submit"
-        className="w-full bg-black hover:bg-gray-800 text-white"
+        className="w-full bg-black rounded-4xl p-3 h-10 hover:bg-gray-800 text-white"
         disabled={loading}
       >
         {loading ? "Processing..." : "Log In"}

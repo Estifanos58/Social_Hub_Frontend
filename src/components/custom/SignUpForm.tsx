@@ -61,6 +61,7 @@ export default function SignUpForm({
         value={formData.password}
         onChange={handleChange}
         error={errors.password}
+        togglePassword // 👈 enables eye toggle
       />
 
       {/* Terms */}
@@ -76,10 +77,7 @@ export default function SignUpForm({
             }))
           }
         />
-        <label
-          htmlFor="terms"
-          className="text-sm text-gray-600 cursor-pointer"
-        >
+        <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
           I agree to the{" "}
           <a href="#" className="text-blue-600 hover:underline">
             Terms & Conditions
@@ -92,7 +90,7 @@ export default function SignUpForm({
 
       <Button
         type="submit"
-        className="w-full bg-black hover:bg-gray-800 text-white"
+        className="w-full bg-black rounded-4xl p-3 h-10 hover:bg-gray-800 text-white"
         disabled={loading}
       >
         {loading ? "Processing..." : "Create Account"}
