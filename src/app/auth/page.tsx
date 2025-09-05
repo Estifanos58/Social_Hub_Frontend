@@ -13,6 +13,7 @@ import LoginForm from "@/components/custom/LoginForm";
 import SignUpForm from "@/components/custom/SignUpForm";
 import GoogleOAuth from "@/components/shared/GoogleOAuth";
 import { useRouter } from "next/navigation";
+import GitHubOAuth from "@/components/shared/GitHubOAuth";
 
 const initialState = {
   firstname: "",
@@ -173,19 +174,9 @@ export default function AuthPage() {
       </div>
 
       {/* Social Logins */}
-      <div className="mt-4 space-y-3 w-full">
+      <div className="mt-4 flex gap-3  space-y-3 w-full">
         <GoogleOAuth />
-        <Button
-          variant="outline"
-          className="w-full flex items-center justify-center gap-2 py-2"
-        >
-          <img
-            src="https://www.svgrepo.com/show/475647/facebook-color.svg"
-            alt="Facebook"
-            className="w-5 h-5"
-          />
-          <span className="text-sm font-medium">Continue with Facebook</span>
-        </Button>
+        <GitHubOAuth/>
       </div>
     </div>
   );
