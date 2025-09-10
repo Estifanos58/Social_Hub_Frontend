@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@apollo/client/react";
-import { REGISTER_USER } from "@/graphql/mutations/Register";
-import { LOGIN_USER } from "@/graphql/mutations/LoginUser";
+import { REGISTER_USER } from "@/graphql/mutations/auth/Register";
+import { LOGIN_USER } from "@/graphql/mutations/auth/LoginUser";
 import { SignUp, Login } from "@/validator/Auth.validator";
 import { z } from "zod";
 import { LoginMutation, RegisterMutation } from "@/gql/graphql";
