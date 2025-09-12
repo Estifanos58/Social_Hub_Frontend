@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { toast } from "react-toastify";
 import { useMutation } from "@apollo/client/react";
 import { VERIFY_EMAIL } from "@/graphql/mutations/auth/VerifyEmail";
 import { VerifyEmailMutation } from "@/gql/graphql";
 import { useUserStore } from "@/store/userStore";
+import { toast } from "sonner";
 
 export default function VerifyPage() {
   const [codes, setCodes] = useState<string[]>(["", "", "", ""]);

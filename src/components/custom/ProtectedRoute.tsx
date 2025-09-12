@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { GetMeQuery } from "@/gql/graphql";
 import { GET_CURRENT_USER } from "@/graphql/queries/auth/getCurrentUser";
@@ -10,22 +10,25 @@ import { useEffect } from "react";
 export default function ProtectedRoute({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { data, loading, error } = useQuery<GetMeQuery>(GET_CURRENT_USER);
+  const { data, loading, error } = useQuery<GetMeQuery>(GET_CURRENT_USER, {
+    fetchPolicy: "network-only", // always fetch fresh user data
+  });
   const { setUser } = useUserStore();
-  const navigate = useRouter();
+  const router = useRouter();
 
   useEffect(() => {
-    console.log("User data", data?.getme);
+    if (loading) return; // wait until query finishes
+
     if (data?.getme) {
       setUser(data.getme as any);
+    } else {
+      router.replace("/auth"); // redirect when no user
     }
-    if ((!loading && !data?.getme) || error ) {
-      navigate.push("/auth");
-    }
-  }, [data]);
+  }, [loading, data, error, setUser, router]);
 
   if (loading) {
-    return <p>Loading</p>;
+    return <p>Loading...</p>;
   }
+
   return <>{children}</>;
 }

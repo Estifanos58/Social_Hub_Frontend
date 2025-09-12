@@ -1,14 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { toast } from "react-toastify";
 import { useMutation } from "@apollo/client/react";
-import { email, z } from "zod";
 import InputField from "@/components/shared/InputField";
 import { EmailSchema, ResetPasswordSchema } from "@/validator/Auth.validator";
 import { SEND_RESET_CODE } from "@/graphql/mutations/auth/Sendresetcode";
 import { RESET_PASSWORD } from "@/graphql/mutations/auth/Resetpassword";
 import { useUserStore } from "@/store/userStore";
+import { toast } from "sonner";
 
 
 

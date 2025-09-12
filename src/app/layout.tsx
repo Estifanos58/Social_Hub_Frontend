@@ -4,8 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ApolloProvider } from "@apollo/client/react";
 import { client } from "../../apolloClient";
-import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "@/components/custom/ProtectedRoute";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +28,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ApolloProvider client={client}>
+          <Toaster/>
           <ProtectedRoute>{children}</ProtectedRoute>
-          <ToastContainer />
         </ApolloProvider>
       </body>
     </html>

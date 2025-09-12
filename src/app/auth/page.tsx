@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useMutation } from "@apollo/client/react";
 import { REGISTER_USER } from "@/graphql/mutations/auth/Register";
 import { LOGIN_USER } from "@/graphql/mutations/auth/LoginUser";
@@ -8,12 +7,12 @@ import { SignUp, Login } from "@/validator/Auth.validator";
 import { z } from "zod";
 import { LoginMutation, RegisterMutation } from "@/gql/graphql";
 import { useUserStore } from "@/store/userStore";
-import { toast } from "react-toastify";
 import LoginForm from "@/components/custom/LoginForm";
 import SignUpForm from "@/components/custom/SignUpForm";
 import GoogleOAuth from "@/components/shared/GoogleOAuth";
 import { useRouter } from "next/navigation";
 import GitHubOAuth from "@/components/shared/GitHubOAuth";
+import { toast } from "sonner";
 
 const initialState = {
   firstname: "",
