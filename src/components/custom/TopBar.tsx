@@ -1,4 +1,4 @@
-'use clinet';
+'use client';
 
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";

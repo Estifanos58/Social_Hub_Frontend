@@ -2,9 +2,10 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ApolloProvider} from "@apollo/client/react";
+import { ApolloProvider } from "@apollo/client/react";
 import { client } from "../../apolloClient";
 import { ToastContainer } from "react-toastify";
+import ProtectedRoute from "@/components/custom/ProtectedRoute";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +16,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-
 
 export default function RootLayout({
   children,
@@ -29,7 +28,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ApolloProvider client={client}>
-          {children}
+          <ProtectedRoute>{children}</ProtectedRoute>
           <ToastContainer />
         </ApolloProvider>
       </body>
