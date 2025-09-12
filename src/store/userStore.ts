@@ -8,6 +8,8 @@ interface User {
     avatarUrl?: string;
     lastSeenAt?: Date;
     bio?: string;
+    verified?: boolean;
+    isPrivate?: boolean;
     createdAt: string;
     updatedAt: string;
 

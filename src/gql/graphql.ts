@@ -18,19 +18,169 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
+/** Types of Roles in the chat room */
+export enum ChatRoomRole {
+  Admin = 'ADMIN',
+  Member = 'MEMBER',
+  Moderator = 'MODERATOR',
+  Owner = 'OWNER'
+}
+
+export type ChatroomDto = {
+  __typename?: 'ChatroomDto';
+  avatarUrl?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  isGroup: Scalars['Boolean']['output'];
+  memberships?: Maybe<Array<ChatroomUserDto>>;
+  messages?: Maybe<Array<MessageDto>>;
+  name?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ChatroomUserDto = {
+  __typename?: 'ChatroomUserDto';
+  chatroom?: Maybe<ChatroomDto>;
+  chatroomId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  isMuted: Scalars['Boolean']['output'];
+  joinedAt: Scalars['DateTime']['output'];
+  lastReadAt?: Maybe<Scalars['DateTime']['output']>;
+  role: ChatRoomRole;
+  user?: Maybe<UserDto>;
+  userId: Scalars['String']['output'];
+};
+
+export type CommentDto = {
+  __typename?: 'CommentDto';
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  parent?: Maybe<CommentDto>;
+  parentId?: Maybe<Scalars['String']['output']>;
+  post?: Maybe<PostDto>;
+  postId: Scalars['String']['output'];
+  replies?: Maybe<Array<CommentDto>>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type CreateCommentDto = {
+  content: Scalars['String']['input'];
+  parentId?: InputMaybe<Scalars['String']['input']>;
+  postId: Scalars['String']['input'];
+};
+
+export type CreateCommentResponse = {
+  __typename?: 'CreateCommentResponse';
+  comment?: Maybe<CommentDto>;
+};
+
+export type CreatePostDto = {
+  content: Scalars['String']['input'];
+  imageUrls?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type FollowerDto = {
+  __typename?: 'FollowerDto';
+  createdAt: Scalars['DateTime']['output'];
+  follower?: Maybe<UserDto>;
+  followerId: Scalars['String']['output'];
+  following?: Maybe<UserDto>;
+  followingId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+};
+
+export type GetPostType = {
+  __typename?: 'GetPostType';
+  comments?: Maybe<Array<CommentDto>>;
+  commentsCount: Scalars['Int']['output'];
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  images?: Maybe<Array<PostImageDto>>;
+  reactions?: Maybe<Array<ReactionDto>>;
+  reactionsCount: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type LoginDto = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
 };
 
+export type MessageDto = {
+  __typename?: 'MessageDto';
+  chatroom?: Maybe<ChatroomDto>;
+  chatroomId: Scalars['String']['output'];
+  content?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  isEdited: Scalars['Boolean']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  user?: Maybe<UserDto>;
+  userId: Scalars['String']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  GetUser: UserProfileDto;
+  UnfollowUser: Scalars['String']['output'];
+  UpdateUser: UserProfileDto;
+  createComment: CreateCommentResponse;
+  createPost: Scalars['String']['output'];
+  deletePost: Scalars['String']['output'];
+  followUser: Scalars['String']['output'];
   forgotPassword: Scalars['String']['output'];
   login: UserResponse;
   logout: Scalars['String']['output'];
   register: UserResponse;
   resetPassword: UserResponse;
   verifyEmail: UserResponse;
+};
+
+
+export type MutationGetUserArgs = {
+  userId: Scalars['String']['input'];
+};
+
+
+export type MutationUnfollowUserArgs = {
+  followingId: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateUserArgs = {
+  updateUser: UpdateUserDto;
+};
+
+
+export type MutationCreateCommentArgs = {
+  createCommentInput: CreateCommentDto;
+};
+
+
+export type MutationCreatePostArgs = {
+  createPost: CreatePostDto;
+};
+
+
+export type MutationDeletePostArgs = {
+  postId: Scalars['String']['input'];
+};
+
+
+export type MutationFollowUserArgs = {
+  followingId: Scalars['String']['input'];
 };
 
 
@@ -59,10 +209,85 @@ export type MutationVerifyEmailArgs = {
   token: Scalars['String']['input'];
 };
 
+export type PaginatedPostsDto = {
+  __typename?: 'PaginatedPostsDto';
+  hasMore: Scalars['Boolean']['output'];
+  posts: Array<PostFeedDto>;
+};
+
+export type PostDto = {
+  __typename?: 'PostDto';
+  comments?: Maybe<Array<CommentDto>>;
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  images?: Maybe<Array<PostImageDto>>;
+  reactions?: Maybe<Array<ReactionDto>>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type PostFeedDto = {
+  __typename?: 'PostFeedDto';
+  commentsCount: Scalars['Int']['output'];
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  images?: Maybe<Array<PostImageDto>>;
+  reactionsCount: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type PostImageDto = {
+  __typename?: 'PostImageDto';
+  id: Scalars['String']['output'];
+  postId: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
-  getuser: User;
+  getPost: GetPostType;
+  getPosts: PaginatedPostsDto;
+  getme: UserDto;
 };
+
+
+export type QueryGetPostArgs = {
+  postId: Scalars['String']['input'];
+};
+
+
+export type QueryGetPostsArgs = {
+  cursor: Scalars['String']['input'];
+  take: Scalars['Float']['input'];
+};
+
+export type ReactionDto = {
+  __typename?: 'ReactionDto';
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  post?: Maybe<PostDto>;
+  postId: Scalars['String']['output'];
+  type: ReactionType;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Types of reactions a user can make on a post */
+export enum ReactionType {
+  Angry = 'ANGRY',
+  Haha = 'HAHA',
+  Like = 'LIKE',
+  Love = 'LOVE',
+  Sad = 'SAD',
+  Wow = 'WOW'
+}
 
 export type RegisterDto = {
   email: Scalars['String']['input'];
@@ -71,23 +296,48 @@ export type RegisterDto = {
   password: Scalars['String']['input'];
 };
 
-export type User = {
-  __typename?: 'User';
+export type UpdateUserDto = {
+  avatarUrl?: InputMaybe<Scalars['String']['input']>;
+  bio?: InputMaybe<Scalars['String']['input']>;
+  firstname?: InputMaybe<Scalars['String']['input']>;
+  isPrivate?: InputMaybe<Scalars['Boolean']['input']>;
+  lastname?: InputMaybe<Scalars['String']['input']>;
+  twoFactorEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type UserDto = {
+  __typename?: 'UserDto';
   avatarUrl?: Maybe<Scalars['String']['output']>;
   bio?: Maybe<Scalars['String']['output']>;
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  chatroomsCreated?: Maybe<Array<ChatroomDto>>;
+  comments?: Maybe<Array<CommentDto>>;
+  createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
-  firstname?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['String']['output']>;
-  isActive?: Maybe<Scalars['Boolean']['output']>;
+  firstname: Scalars['String']['output'];
+  followers?: Maybe<Array<FollowerDto>>;
+  following?: Maybe<Array<FollowerDto>>;
+  id: Scalars['String']['output'];
+  isPrivate: Scalars['Boolean']['output'];
   lastSeenAt?: Maybe<Scalars['DateTime']['output']>;
   lastname?: Maybe<Scalars['String']['output']>;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  memberships?: Maybe<Array<ChatroomUserDto>>;
+  messages?: Maybe<Array<MessageDto>>;
+  posts?: Maybe<Array<PostDto>>;
+  reactions?: Maybe<Array<ReactionDto>>;
+  updatedAt: Scalars['DateTime']['output'];
+  verified: Scalars['Boolean']['output'];
+};
+
+export type UserProfileDto = {
+  __typename?: 'UserProfileDto';
+  followersCount?: Maybe<Scalars['Float']['output']>;
+  followingCount?: Maybe<Scalars['Float']['output']>;
+  user: UserDto;
 };
 
 export type UserResponse = {
   __typename?: 'UserResponse';
-  user?: Maybe<User>;
+  user?: Maybe<UserDto>;
 };
 
 export type LoginMutationVariables = Exact<{
@@ -96,7 +346,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', user?: { __typename?: 'User', id?: string | null, email: string, firstname?: string | null, avatarUrl?: string | null } | null } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', user?: { __typename?: 'UserDto', id: string, email: string, firstname: string, avatarUrl?: string | null } | null } };
 
 export type RegisterMutationVariables = Exact<{
   firstname: Scalars['String']['input'];
@@ -106,7 +356,7 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', user?: { __typename?: 'User', id?: string | null, firstname?: string | null, email: string } | null } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', user?: { __typename?: 'UserDto', id: string, firstname: string, email: string } | null } };
 
 export type ResetPasswordMutationVariables = Exact<{
   token: Scalars['String']['input'];
@@ -114,7 +364,7 @@ export type ResetPasswordMutationVariables = Exact<{
 }>;
 
 
-export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'UserResponse', user?: { __typename?: 'User', id?: string | null, firstname?: string | null, email: string, bio?: string | null, avatarUrl?: string | null } | null } };
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'UserResponse', user?: { __typename?: 'UserDto', id: string, firstname: string, email: string, bio?: string | null, avatarUrl?: string | null } | null } };
 
 export type SendResetCodeMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -128,7 +378,19 @@ export type VerifyEmailMutationVariables = Exact<{
 }>;
 
 
-export type VerifyEmailMutation = { __typename?: 'Mutation', verifyEmail: { __typename?: 'UserResponse', user?: { __typename?: 'User', id?: string | null, firstname?: string | null, email: string, bio?: string | null, avatarUrl?: string | null } | null } };
+export type VerifyEmailMutation = { __typename?: 'Mutation', verifyEmail: { __typename?: 'UserResponse', user?: { __typename?: 'UserDto', id: string, firstname: string, email: string, bio?: string | null, avatarUrl?: string | null } | null } };
+
+export type DeletePostMutationVariables = Exact<{
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type DeletePostMutation = { __typename?: 'Mutation', deletePost: string };
+
+export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMeQuery = { __typename?: 'Query', getme: { __typename?: 'UserDto', id: string, email: string, firstname: string, lastname?: string | null, avatarUrl?: string | null, verified: boolean, isPrivate: boolean, bio?: string | null } };
 
 
 export const LoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Login"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"loginInput"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}}]}}]}}]}}]} as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
@@ -136,6 +398,8 @@ export const RegisterDocument = {"kind":"Document","definitions":[{"kind":"Opera
 export const ResetPasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResetPassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"newPassword"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resetPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"token"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}},{"kind":"Argument","name":{"kind":"Name","value":"newPassword"},"value":{"kind":"Variable","name":{"kind":"Name","value":"newPassword"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"bio"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}}]}}]}}]}}]} as unknown as DocumentNode<ResetPasswordMutation, ResetPasswordMutationVariables>;
 export const SendResetCodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SendResetCode"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"forgotPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}}]}]}}]} as unknown as DocumentNode<SendResetCodeMutation, SendResetCodeMutationVariables>;
 export const VerifyEmailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"VerifyEmail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"verifyEmail"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"token"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"bio"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}}]}}]}}]}}]} as unknown as DocumentNode<VerifyEmailMutation, VerifyEmailMutationVariables>;
+export const DeletePostDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeletePost"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"postId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deletePost"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"postId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"postId"}}}]}]}}]} as unknown as DocumentNode<DeletePostMutation, DeletePostMutationVariables>;
+export const GetMeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMe"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getme"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}},{"kind":"Field","name":{"kind":"Name","value":"verified"}},{"kind":"Field","name":{"kind":"Name","value":"isPrivate"}},{"kind":"Field","name":{"kind":"Name","value":"bio"}}]}}]}}]} as unknown as DocumentNode<GetMeQuery, GetMeQueryVariables>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -147,19 +411,169 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
+/** Types of Roles in the chat room */
+export enum ChatRoomRole {
+  Admin = 'ADMIN',
+  Member = 'MEMBER',
+  Moderator = 'MODERATOR',
+  Owner = 'OWNER'
+}
+
+export type ChatroomDto = {
+  __typename?: 'ChatroomDto';
+  avatarUrl?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  isGroup: Scalars['Boolean']['output'];
+  memberships?: Maybe<Array<ChatroomUserDto>>;
+  messages?: Maybe<Array<MessageDto>>;
+  name?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ChatroomUserDto = {
+  __typename?: 'ChatroomUserDto';
+  chatroom?: Maybe<ChatroomDto>;
+  chatroomId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  isMuted: Scalars['Boolean']['output'];
+  joinedAt: Scalars['DateTime']['output'];
+  lastReadAt?: Maybe<Scalars['DateTime']['output']>;
+  role: ChatRoomRole;
+  user?: Maybe<UserDto>;
+  userId: Scalars['String']['output'];
+};
+
+export type CommentDto = {
+  __typename?: 'CommentDto';
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  parent?: Maybe<CommentDto>;
+  parentId?: Maybe<Scalars['String']['output']>;
+  post?: Maybe<PostDto>;
+  postId: Scalars['String']['output'];
+  replies?: Maybe<Array<CommentDto>>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type CreateCommentDto = {
+  content: Scalars['String']['input'];
+  parentId?: InputMaybe<Scalars['String']['input']>;
+  postId: Scalars['String']['input'];
+};
+
+export type CreateCommentResponse = {
+  __typename?: 'CreateCommentResponse';
+  comment?: Maybe<CommentDto>;
+};
+
+export type CreatePostDto = {
+  content: Scalars['String']['input'];
+  imageUrls?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type FollowerDto = {
+  __typename?: 'FollowerDto';
+  createdAt: Scalars['DateTime']['output'];
+  follower?: Maybe<UserDto>;
+  followerId: Scalars['String']['output'];
+  following?: Maybe<UserDto>;
+  followingId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+};
+
+export type GetPostType = {
+  __typename?: 'GetPostType';
+  comments?: Maybe<Array<CommentDto>>;
+  commentsCount: Scalars['Int']['output'];
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  images?: Maybe<Array<PostImageDto>>;
+  reactions?: Maybe<Array<ReactionDto>>;
+  reactionsCount: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type LoginDto = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
 };
 
+export type MessageDto = {
+  __typename?: 'MessageDto';
+  chatroom?: Maybe<ChatroomDto>;
+  chatroomId: Scalars['String']['output'];
+  content?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  isEdited: Scalars['Boolean']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  user?: Maybe<UserDto>;
+  userId: Scalars['String']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  GetUser: UserProfileDto;
+  UnfollowUser: Scalars['String']['output'];
+  UpdateUser: UserProfileDto;
+  createComment: CreateCommentResponse;
+  createPost: Scalars['String']['output'];
+  deletePost: Scalars['String']['output'];
+  followUser: Scalars['String']['output'];
   forgotPassword: Scalars['String']['output'];
   login: UserResponse;
   logout: Scalars['String']['output'];
   register: UserResponse;
   resetPassword: UserResponse;
   verifyEmail: UserResponse;
+};
+
+
+export type MutationGetUserArgs = {
+  userId: Scalars['String']['input'];
+};
+
+
+export type MutationUnfollowUserArgs = {
+  followingId: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateUserArgs = {
+  updateUser: UpdateUserDto;
+};
+
+
+export type MutationCreateCommentArgs = {
+  createCommentInput: CreateCommentDto;
+};
+
+
+export type MutationCreatePostArgs = {
+  createPost: CreatePostDto;
+};
+
+
+export type MutationDeletePostArgs = {
+  postId: Scalars['String']['input'];
+};
+
+
+export type MutationFollowUserArgs = {
+  followingId: Scalars['String']['input'];
 };
 
 
@@ -188,10 +602,85 @@ export type MutationVerifyEmailArgs = {
   token: Scalars['String']['input'];
 };
 
+export type PaginatedPostsDto = {
+  __typename?: 'PaginatedPostsDto';
+  hasMore: Scalars['Boolean']['output'];
+  posts: Array<PostFeedDto>;
+};
+
+export type PostDto = {
+  __typename?: 'PostDto';
+  comments?: Maybe<Array<CommentDto>>;
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  images?: Maybe<Array<PostImageDto>>;
+  reactions?: Maybe<Array<ReactionDto>>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type PostFeedDto = {
+  __typename?: 'PostFeedDto';
+  commentsCount: Scalars['Int']['output'];
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  images?: Maybe<Array<PostImageDto>>;
+  reactionsCount: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type PostImageDto = {
+  __typename?: 'PostImageDto';
+  id: Scalars['String']['output'];
+  postId: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
-  getuser: User;
+  getPost: GetPostType;
+  getPosts: PaginatedPostsDto;
+  getme: UserDto;
 };
+
+
+export type QueryGetPostArgs = {
+  postId: Scalars['String']['input'];
+};
+
+
+export type QueryGetPostsArgs = {
+  cursor: Scalars['String']['input'];
+  take: Scalars['Float']['input'];
+};
+
+export type ReactionDto = {
+  __typename?: 'ReactionDto';
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<UserDto>;
+  createdById: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  post?: Maybe<PostDto>;
+  postId: Scalars['String']['output'];
+  type: ReactionType;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Types of reactions a user can make on a post */
+export enum ReactionType {
+  Angry = 'ANGRY',
+  Haha = 'HAHA',
+  Like = 'LIKE',
+  Love = 'LOVE',
+  Sad = 'SAD',
+  Wow = 'WOW'
+}
 
 export type RegisterDto = {
   email: Scalars['String']['input'];
@@ -200,21 +689,46 @@ export type RegisterDto = {
   password: Scalars['String']['input'];
 };
 
-export type User = {
-  __typename?: 'User';
+export type UpdateUserDto = {
+  avatarUrl?: InputMaybe<Scalars['String']['input']>;
+  bio?: InputMaybe<Scalars['String']['input']>;
+  firstname?: InputMaybe<Scalars['String']['input']>;
+  isPrivate?: InputMaybe<Scalars['Boolean']['input']>;
+  lastname?: InputMaybe<Scalars['String']['input']>;
+  twoFactorEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type UserDto = {
+  __typename?: 'UserDto';
   avatarUrl?: Maybe<Scalars['String']['output']>;
   bio?: Maybe<Scalars['String']['output']>;
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  chatroomsCreated?: Maybe<Array<ChatroomDto>>;
+  comments?: Maybe<Array<CommentDto>>;
+  createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
-  firstname?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['String']['output']>;
-  isActive?: Maybe<Scalars['Boolean']['output']>;
+  firstname: Scalars['String']['output'];
+  followers?: Maybe<Array<FollowerDto>>;
+  following?: Maybe<Array<FollowerDto>>;
+  id: Scalars['String']['output'];
+  isPrivate: Scalars['Boolean']['output'];
   lastSeenAt?: Maybe<Scalars['DateTime']['output']>;
   lastname?: Maybe<Scalars['String']['output']>;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  memberships?: Maybe<Array<ChatroomUserDto>>;
+  messages?: Maybe<Array<MessageDto>>;
+  posts?: Maybe<Array<PostDto>>;
+  reactions?: Maybe<Array<ReactionDto>>;
+  updatedAt: Scalars['DateTime']['output'];
+  verified: Scalars['Boolean']['output'];
+};
+
+export type UserProfileDto = {
+  __typename?: 'UserProfileDto';
+  followersCount?: Maybe<Scalars['Float']['output']>;
+  followingCount?: Maybe<Scalars['Float']['output']>;
+  user: UserDto;
 };
 
 export type UserResponse = {
   __typename?: 'UserResponse';
-  user?: Maybe<User>;
+  user?: Maybe<UserDto>;
 };

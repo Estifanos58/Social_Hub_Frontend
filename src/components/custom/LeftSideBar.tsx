@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react";
 import { BiHomeAlt2 } from "react-icons/bi";
 import { IoMdNotificationsOutline } from "react-icons/io";

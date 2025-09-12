@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ApolloProvider } from "@apollo/client/react";
+import { ApolloProvider} from "@apollo/client/react";
 import { client } from "../../apolloClient";
 import { ToastContainer } from "react-toastify";
 
@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,8 +29,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ApolloProvider client={client}>
-        {children}
-        <ToastContainer/>
+          {children}
+          <ToastContainer />
         </ApolloProvider>
       </body>
     </html>

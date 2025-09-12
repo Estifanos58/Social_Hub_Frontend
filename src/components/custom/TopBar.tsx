@@ -1,3 +1,6 @@
+'use clinet';
+
+import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import React from "react";
 import { CiSearch, CiCirclePlus } from "react-icons/ci";
@@ -5,6 +8,7 @@ import { IoChatbubbleOutline } from "react-icons/io5";
 import { IoNotificationsOutline } from "react-icons/io5";
 
 function TopBar() {
+  const { user } = useUserStore()
   const TopLinks = [
     { icon: <CiSearch size={20} />, label: "Search" },
     { icon: <CiCirclePlus size={20} />, label: "New Post" },
@@ -34,13 +38,13 @@ function TopBar() {
         {/* Demo User */}
         <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 space-x-2 cursor-pointer hover:bg-gray-700 transition">
           <Image
-            src="/noAvatar.png" // <-- place demo-user.jpg inside public folder
+            src={`${user?.avatarUrl ? user.avatarUrl : '/noAvatar.png'}`} // <-- place demo-user.jpg inside public folder
             alt="User Avatar"
             width={32}
             height={32}
             className="w-8 h-8 rounded-full object-cover"
           />
-          <span className="text-sm font-medium text-white">Esmeralda</span>
+          <span className="text-sm font-medium text-white">{user?.firstname}</span>
         </div>
       </div>
     </div>

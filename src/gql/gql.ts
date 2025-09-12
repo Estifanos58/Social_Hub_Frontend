@@ -19,6 +19,8 @@ type Documents = {
     "\n      mutation ResetPassword(\n        $token: String!, \n        $newPassword: String!\n        ) {\n    resetPassword(\n        token: $token, \n        newPassword: $newPassword\n        ) {\n        user {\n            id\n            firstname\n            email\n            bio\n            avatarUrl\n        }\n    }\n  }\n": typeof types.ResetPasswordDocument,
     "\n    mutation SendResetCode($email: String!) {\n        forgotPassword(email: $email) \n    }\n": typeof types.SendResetCodeDocument,
     "\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n": typeof types.VerifyEmailDocument,
+    "\n    mutation DeletePost($postId: String!) {\n        deletePost(postId: $postId)}": typeof types.DeletePostDocument,
+    "\n  query GetMe {\n    getme {\n        id\n        email\n        firstname\n        lastname\n        avatarUrl\n        verified\n        isPrivate\n        bio\n    }\n  }\n": typeof types.GetMeDocument,
 };
 const documents: Documents = {
     "\n  mutation Login($email: String!, $password: String!) {\n    login(loginInput: { email: $email, password: $password }) {\n      user {\n        id\n        email\n        firstname\n        avatarUrl\n      }\n    }\n  }\n": types.LoginDocument,
@@ -26,6 +28,8 @@ const documents: Documents = {
     "\n      mutation ResetPassword(\n        $token: String!, \n        $newPassword: String!\n        ) {\n    resetPassword(\n        token: $token, \n        newPassword: $newPassword\n        ) {\n        user {\n            id\n            firstname\n            email\n            bio\n            avatarUrl\n        }\n    }\n  }\n": types.ResetPasswordDocument,
     "\n    mutation SendResetCode($email: String!) {\n        forgotPassword(email: $email) \n    }\n": types.SendResetCodeDocument,
     "\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n": types.VerifyEmailDocument,
+    "\n    mutation DeletePost($postId: String!) {\n        deletePost(postId: $postId)}": types.DeletePostDocument,
+    "\n  query GetMe {\n    getme {\n        id\n        email\n        firstname\n        lastname\n        avatarUrl\n        verified\n        isPrivate\n        bio\n    }\n  }\n": types.GetMeDocument,
 };
 
 /**
@@ -62,6 +66,14 @@ export function graphql(source: "\n    mutation SendResetCode($email: String!) {
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    mutation DeletePost($postId: String!) {\n        deletePost(postId: $postId)}"): (typeof documents)["\n    mutation DeletePost($postId: String!) {\n        deletePost(postId: $postId)}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetMe {\n    getme {\n        id\n        email\n        firstname\n        lastname\n        avatarUrl\n        verified\n        isPrivate\n        bio\n    }\n  }\n"): (typeof documents)["\n  query GetMe {\n    getme {\n        id\n        email\n        firstname\n        lastname\n        avatarUrl\n        verified\n        isPrivate\n        bio\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
