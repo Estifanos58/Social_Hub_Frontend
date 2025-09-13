@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { CardContent } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Camera } from "lucide-react";
+import { uploadImageToCloudinary } from "@/lib/uploadFile";
 
 interface ImageUploadProps {
   formData: {
@@ -14,10 +15,7 @@ interface ImageUploadProps {
   setFormData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export default function ImageUpload({
-  formData,
-  setFormData,
-}: ImageUploadProps) {
+export default function ImageUpload({ formData, setFormData }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState<{
@@ -25,9 +23,7 @@ export default function ImageUpload({
     type: "success" | "error";
   } | null>(null);
 
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -35,66 +31,18 @@ export default function ImageUpload({
     setProgress(0);
     setStatusMessage(null);
 
-    try {
-      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const result = await uploadImageToCloudinary(file, (p) => setProgress(p));
 
-      console.log("Upload Preset:", uploadPreset);
-      console.log("Cloud Name:", cloudName);
-      
-      const formDataCloud = new FormData();
-      formDataCloud.append("file", file);
-      formDataCloud.append("upload_preset", uploadPreset!); // Replace with your preset
-      formDataCloud.append("cloud_name", cloudName!); // Replace with your Cloudinary cloud name
+    setUploading(false);
 
-      const xhr = new XMLHttpRequest();
-      xhr.open(
-        "POST",
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        true
-      );
-
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = Math.round(
-            (event.loaded / event.total) * 100
-          );
-          setProgress(percentComplete);
-        }
-      };
-
-      xhr.onload = () => {
-        setUploading(false);
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.responseText);
-          setFormData((prev: any) => ({
-            ...prev,
-            avatarUrl: response.secure_url,
-          }));
-          setStatusMessage({ text: "Upload successful!", type: "success" });
-        } else {
-          setStatusMessage({
-            text: "Upload failed. Try again.",
-            type: "error",
-          });
-        }
-      };
-
-      xhr.onerror = () => {
-        setUploading(false);
-        setStatusMessage({
-          text: "Upload failed. Network error.",
-          type: "error",
-        });
-      };
-
-      xhr.send(formDataCloud);
-    } catch (err) {
-      setUploading(false);
-      setStatusMessage({
-        text: "Upload failed. Something went wrong.",
-        type: "error",
-      });
+    if (result.success && result.url) {
+      setFormData((prev: any) => ({
+        ...prev,
+        avatarUrl: result.url!,
+      }));
+      setStatusMessage({ text: "Upload successful!", type: "success" });
+    } else {
+      setStatusMessage({ text: result.error || "Upload failed", type: "error" });
     }
   };
 

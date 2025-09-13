@@ -41,7 +41,7 @@ export default function ProfilePage() {
   // 🔄 Loading
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-white">
+      <div className="min-h-screen flex-1 bg-black flex items-center justify-center text-white">
         <p className="animate-pulse text-gray-400">Loading profile...</p>
       </div>
     )
@@ -50,7 +50,7 @@ export default function ProfilePage() {
   // ❌ Error
   if (error) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-red-500">
+      <div className="min-h-screen flex-1 bg-black flex items-center justify-center text-red-500">
         <p>Failed to load profile: {error.message}</p>
       </div>
     )
@@ -59,7 +59,7 @@ export default function ProfilePage() {
   // 📝 No user
   if (!profile || !account) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-gray-400">
+      <div className="min-h-screen flex-1 bg-black flex items-center justify-center text-gray-400">
         <p>No user profile found.</p>
       </div>
     )

@@ -7,10 +7,12 @@ import { AiOutlineMessage } from "react-icons/ai";
 import { IoMdTrendingUp } from "react-icons/io";
 import Image from "next/image";
 import Link from "next/link";
+import CreatePost from "./CreatePost";
+import { useGeneralStore } from "@/store/generalStore";
 // import { Link } from "lucide-react";
 
 export const LeftSideBar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const {isCollapsed, setIsCollapsed}  = useGeneralStore()
 
   const Links = [
     { icon: <BiHomeAlt2 />, label: "Home", href: "/" },
@@ -52,7 +54,7 @@ export const LeftSideBar = () => {
   }) => (
     <Link href={link || "#"}>
     <div
-      onClick={() => setIsCollapsed(!isCollapsed)}
+      // onClick={() => setIsCollapsed(!isCollapsed)}
       className="flex items-center space-x-3 hover:bg-gray-800 p-3 rounded-lg cursor-pointer transition"
     >
       {image ? (
@@ -96,6 +98,7 @@ export const LeftSideBar = () => {
             link={link.href}
           />
         ))}
+      <CreatePost />
       </div>
     </div>
   );
