@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BiHomeAlt2 } from "react-icons/bi";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { AiOutlineMessage } from "react-icons/ai";
 import { IoMdTrendingUp } from "react-icons/io";
 import Image from "next/image";
+import Link from "next/link";
+// import { Link } from "lucide-react";
 
 export const LeftSideBar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -15,20 +17,40 @@ export const LeftSideBar = () => {
     { icon: <IoMdNotificationsOutline />, label: "Notifications" },
     { icon: <AiOutlineMessage />, label: "Messages" },
     { icon: <IoMdTrendingUp />, label: "Trending" },
-    { image: "/noAvatar.png", label: "Profile" },
+    { image: "/noAvatar.png", label: "Profile" , href: "/profile" },
   ];
+
+  // Handle resize for mobile view
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 600) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+
+    // Run once on mount
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const SidebarItem = ({
     icon,
     label,
     collapsed,
     image,
+    link,
   }: {
     icon: any;
     label: string;
     collapsed: boolean;
     image?: string;
+    link?: string;  
   }) => (
+    <Link href={link || "#"}>
     <div
       onClick={() => setIsCollapsed(!isCollapsed)}
       className="flex items-center space-x-3 hover:bg-gray-800 p-3 rounded-lg cursor-pointer transition"
@@ -40,6 +62,7 @@ export const LeftSideBar = () => {
       )}
       {!collapsed && <span className="text-lg font-medium">{label}</span>}
     </div>
+    </Link>
   );
 
   return (
@@ -70,6 +93,7 @@ export const LeftSideBar = () => {
             label={link.label}
             collapsed={isCollapsed}
             image={link.image}
+            link={link.href}
           />
         ))}
       </div>

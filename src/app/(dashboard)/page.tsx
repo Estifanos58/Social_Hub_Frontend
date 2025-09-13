@@ -1,10 +1,8 @@
-import React from "react";
-import RightSideBar from "./RightSideBar";
-import TopBar from "./TopBar";
+import RightSideBar from "@/components/custom/RightSideBar";
+import TopBar from "@/components/custom/TopBar";
+import { PostDisplay } from "@/components/shared/PostDisplay";
 import { posts } from "@/lib/dummy";
-import { PostDisplay } from "../shared/PostDisplay";
-
-// --- JSON data ---
+import React from "react";
 
 function MainPage() {
   return (
