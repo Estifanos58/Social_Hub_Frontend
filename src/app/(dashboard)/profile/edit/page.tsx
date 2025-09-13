@@ -82,7 +82,7 @@ export default function ProfileUpdatePage() {
   };
 
   return (
-    <div className="dark min-h-screen bg-background">
+    <div className="dark min-h-screen flex-1 overflow-y-scroll bg-background">
       <div className="container max-w-4xl mx-auto py-8 px-4">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
