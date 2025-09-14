@@ -12,4 +12,5 @@ export const useGeneralStore = create<GeneralState>((set) => ({
     setIsCollapsed: (input: boolean) => set({ isCollapsed: input }),
     isMobile: false,
     setMobile: (input: boolean) => set({isMobile: input})
+    
 }));
