@@ -18,7 +18,7 @@ function RightSideBar() {
     }
   );
 
-  const { usersToFollow, setUsersToFollow } = useUserStore();
+  const { user, usersToFollow, setUsersToFollow } = useUserStore();
 
   useEffect(() => {
     if (!loading && data?.GetUsersToFollow?.users) {
@@ -31,6 +31,23 @@ function RightSideBar() {
   return (
     <div className="hidden md:flex w-[350px] border-l border-gray-800 bg-gray-900 flex-col justify-between p-4">
       {/* Suggested Section */}
+      {/* User Profile Section */}
+      <div className="flex items-center mb-6 space-x-3 bg-gray-800/60 rounded-xl px-4 py-2 cursor-pointer hover:bg-gray-700/70 transition">
+        <Image
+          src={user?.avatarUrl ? user.avatarUrl : "/noAvatar.png"}
+          alt="User Avatar"
+          width={40}
+          height={40}
+          className="w-10 h-10 rounded-full object-cover border border-gray-700"
+        />
+        <div className="flex flex-col">
+          <span className="text-sm font-semibold text-white">
+            {user?.firstname || "Guest"}
+          </span>
+          <span className="text-xs text-gray-400">View profile</span>
+        </div>
+      </div>
+
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-gray-300 font-semibold text-xl">

@@ -1,30 +1,40 @@
-import Image from "next/image";
-import Link from "next/link";
+"use client"
 
-export const SidebarItem = ({
-    icon,
-    label,
-    collapsed,
-    image,
-    link,
-  }: {
-    icon: any;
-    label: string;
-    collapsed: boolean;
-    image?: string;
-    link?: string;  
-  }) => (
-    <Link href={link || "#"}>
+import type React from "react"
+
+import Link from "next/link"
+import { useGeneralStore } from "@/store/generalStore"
+
+interface SidebarItemProps {
+  icon: React.ReactNode
+  label: string
+  collapsed: boolean
+  image?: string
+  link?: string
+  onClick?: () => void
+}
+
+export const SidebarItem = ({ icon, label, collapsed, image, link, onClick }: SidebarItemProps) => {
+  const { setIsCollapsed } = useGeneralStore()
+
+  const handleClick = () => {
+    setIsCollapsed(false)
+    if (onClick) onClick()
+  }
+
+  const content = (
     <div
-      // onClick={() => setIsCollapsed(!isCollapsed)}
-      className="flex items-center space-x-3 hover:bg-gray-800 p-3 rounded-lg cursor-pointer transition"
+      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer group"
+      onClick={handleClick}
     >
-      {image ? (
-        <Image src={image} width={32} height={32} alt={label} />
-      ) : (
-        <span className="text-2xl">{icon}</span>
-      )}
-      {!collapsed && <span className="text-lg font-medium">{label}</span>}
+      <span className="text-2xl text-gray-300 group-hover:text-white">{icon}</span>
+      {!collapsed && <span className="text-gray-300 group-hover:text-white font-medium">{label}</span>}
     </div>
-    </Link>
-  );
+  )
+
+  if (link) {
+    return <Link href={link}>{content}</Link>
+  }
+
+  return content
+}
