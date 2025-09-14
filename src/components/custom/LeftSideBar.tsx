@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState, useEffect } from "react";
 import { BiHomeAlt2 } from "react-icons/bi";
@@ -9,26 +9,32 @@ import Image from "next/image";
 import Link from "next/link";
 import CreatePost from "./CreatePost";
 import { useGeneralStore } from "@/store/generalStore";
-// import { Link } from "lucide-react";
+import { SidebarItem } from "./SidebarItem";
 
 export const LeftSideBar = () => {
-  const {isCollapsed, setIsCollapsed}  = useGeneralStore()
+  const { isCollapsed, setIsCollapsed, isMobile, setMobile } =
+    useGeneralStore();
 
   const Links = [
     { icon: <BiHomeAlt2 />, label: "Home", href: "/" },
     { icon: <IoMdNotificationsOutline />, label: "Notifications" },
     { icon: <AiOutlineMessage />, label: "Messages" },
     { icon: <IoMdTrendingUp />, label: "Trending" },
-    { image: "/noAvatar.png", label: "Profile" , href: "/profile" },
+    { image: "/noAvatar.png", label: "Profile", href: "/profile" },
   ];
 
   // Handle resize for mobile view
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 600) {
+        setMobile(true);
+        setIsCollapsed(true); // optional: mobile is always collapsed
+      } else if (window.innerWidth <= 1024) {
         setIsCollapsed(true);
+        setMobile(false);
       } else {
         setIsCollapsed(false);
+        setMobile(false);
       }
     };
 
@@ -39,33 +45,30 @@ export const LeftSideBar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const SidebarItem = ({
-    icon,
-    label,
-    collapsed,
-    image,
-    link,
-  }: {
-    icon: any;
-    label: string;
-    collapsed: boolean;
-    image?: string;
-    link?: string;  
-  }) => (
-    <Link href={link || "#"}>
-    <div
-      // onClick={() => setIsCollapsed(!isCollapsed)}
-      className="flex items-center space-x-3 hover:bg-gray-800 p-3 rounded-lg cursor-pointer transition"
-    >
-      {image ? (
-        <Image src={image} width={32} height={32} alt={label} />
-      ) : (
-        <span className="text-2xl">{icon}</span>
-      )}
-      {!collapsed && <span className="text-lg font-medium">{label}</span>}
-    </div>
-    </Link>
-  );
+  if (isMobile) {
+    return (
+      <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 flex justify-around items-center py-2 z-50">
+        {Links.map((link) => (
+          <Link href={link.href || "#"} key={link.label}>
+            <div className="flex flex-col items-center text-gray-300 hover:text-amber-400">
+              {link.image ? (
+                <Image
+                  src={link.image}
+                  width={24}
+                  height={24}
+                  alt={link.label}
+                  className="rounded-full"
+                />
+              ) : (
+                <span className="text-2xl">{link.icon}</span>
+              )}
+              <span className="text-xs mt-1">{link.label}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -98,7 +101,7 @@ export const LeftSideBar = () => {
             link={link.href}
           />
         ))}
-      <CreatePost />
+        <CreatePost />
       </div>
     </div>
   );

@@ -19,6 +19,7 @@ type Documents = {
     "\n      mutation ResetPassword(\n        $token: String!, \n        $newPassword: String!\n        ) {\n    resetPassword(\n        token: $token, \n        newPassword: $newPassword\n        ) {\n        user {\n            id\n            firstname\n            email\n            bio\n            avatarUrl\n        }\n    }\n  }\n": typeof types.ResetPasswordDocument,
     "\n    mutation SendResetCode($email: String!) {\n        forgotPassword(email: $email) \n    }\n": typeof types.SendResetCodeDocument,
     "\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n": typeof types.VerifyEmailDocument,
+    "\n    mutation CreatePost($content: String!, $imageUrls: [String!]!) {\n        createPost(createPost : { content: $content, imageUrls: $imageUrls}) \n    }\n": typeof types.CreatePostDocument,
     "\n    mutation DeletePost($postId: String!) {\n        deletePost(postId: $postId)}": typeof types.DeletePostDocument,
     "\n    mutation UpdateProfile($firstname: String, $lastname: String, $bio: String, $avatarUrl: String, $isPrivate: Boolean, $twoFactorEnabled: Boolean) {\n        UpdateUser(updateUser: {firstname: $firstname, lastname: $lastname, bio: $bio, avatarUrl: $avatarUrl, isPrivate: $isPrivate, twoFactorEnabled: $twoFactorEnabled}) {\n            id\n            email\n            firstname\n            lastname\n            bio\n            avatarUrl\n            isPrivate\n        }\n    }\n": typeof types.UpdateProfileDocument,
     "\n  query GetMe {\n    getme {\n        id\n        email\n        firstname\n        lastname\n        avatarUrl\n        lastSeenAt\n        createdAt\n        updatedAt\n        verified\n        isPrivate\n        bio\n    }\n  }\n": typeof types.GetMeDocument,
@@ -30,6 +31,7 @@ const documents: Documents = {
     "\n      mutation ResetPassword(\n        $token: String!, \n        $newPassword: String!\n        ) {\n    resetPassword(\n        token: $token, \n        newPassword: $newPassword\n        ) {\n        user {\n            id\n            firstname\n            email\n            bio\n            avatarUrl\n        }\n    }\n  }\n": types.ResetPasswordDocument,
     "\n    mutation SendResetCode($email: String!) {\n        forgotPassword(email: $email) \n    }\n": types.SendResetCodeDocument,
     "\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n": types.VerifyEmailDocument,
+    "\n    mutation CreatePost($content: String!, $imageUrls: [String!]!) {\n        createPost(createPost : { content: $content, imageUrls: $imageUrls}) \n    }\n": types.CreatePostDocument,
     "\n    mutation DeletePost($postId: String!) {\n        deletePost(postId: $postId)}": types.DeletePostDocument,
     "\n    mutation UpdateProfile($firstname: String, $lastname: String, $bio: String, $avatarUrl: String, $isPrivate: Boolean, $twoFactorEnabled: Boolean) {\n        UpdateUser(updateUser: {firstname: $firstname, lastname: $lastname, bio: $bio, avatarUrl: $avatarUrl, isPrivate: $isPrivate, twoFactorEnabled: $twoFactorEnabled}) {\n            id\n            email\n            firstname\n            lastname\n            bio\n            avatarUrl\n            isPrivate\n        }\n    }\n": types.UpdateProfileDocument,
     "\n  query GetMe {\n    getme {\n        id\n        email\n        firstname\n        lastname\n        avatarUrl\n        lastSeenAt\n        createdAt\n        updatedAt\n        verified\n        isPrivate\n        bio\n    }\n  }\n": types.GetMeDocument,
@@ -70,6 +72,10 @@ export function graphql(source: "\n    mutation SendResetCode($email: String!) {
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation VerifyEmail($token: String!) {\n    verifyEmail(token: $token) {\n      user {\n        id\n        firstname\n        email\n        bio\n        avatarUrl\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    mutation CreatePost($content: String!, $imageUrls: [String!]!) {\n        createPost(createPost : { content: $content, imageUrls: $imageUrls}) \n    }\n"): (typeof documents)["\n    mutation CreatePost($content: String!, $imageUrls: [String!]!) {\n        createPost(createPost : { content: $content, imageUrls: $imageUrls}) \n    }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
