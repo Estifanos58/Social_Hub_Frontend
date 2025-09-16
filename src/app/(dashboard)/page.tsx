@@ -1,4 +1,4 @@
-import RightSideBar from "@/components/custom/RightSideBar";
+import RightSideBar from "@/components/custom/sidebars/RightSideBar";
 import TopBar from "@/components/custom/TopBar";
 import { PostDisplay } from "@/components/shared/PostDisplay";
 import { posts } from "@/lib/dummy";

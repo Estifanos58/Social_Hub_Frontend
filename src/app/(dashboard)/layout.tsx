@@ -1,4 +1,5 @@
-import { LeftSideBar } from "@/components/custom/LeftSideBar";
+import { LeftSideBar } from "@/components/custom/sidebars/LeftSideBar";
+
 
 export default function DashboardLayout({
     children,

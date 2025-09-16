@@ -1,10 +1,10 @@
 import Image from "next/image";
 import React from "react";
-import { Button } from "../ui/button";
-import { Skeleton } from "../ui/skeleton";
 import { useMutation } from "@apollo/client/react";
 import { FOLLOW_USER } from "@/graphql/mutations/user/FollowUser";
 import { useUserStore } from "@/store/userStore";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function SidebarContact({
   user,

@@ -7,13 +7,12 @@ import { AiOutlineMessage } from "react-icons/ai";
 import { IoMdTrendingUp } from "react-icons/io";
 import { RiUserFollowLine } from "react-icons/ri";
 import Link from "next/link";
-import CreatePost from "./CreatePost";
 import { useGeneralStore } from "@/store/generalStore";
-import { SidebarItem } from "./SidebarItem";
-import { IoPersonCircle, IoSearchOutline } from "react-icons/io5";
-import { on } from "events";
-import Search from "./Search";
-import SearchPopUp from "./Search";
+import { IoPersonCircle} from "react-icons/io5";
+import { SidebarItem } from "../SidebarItem";
+import CreatePost from "../CreatePost";
+import SearchPopUp from "./popUps/SearchPopUp";
+import FollowersPopUp from "./popUps/FollowersPopUp";
 
 export const LeftSideBar = () => {
   const {
@@ -23,6 +22,8 @@ export const LeftSideBar = () => {
     setMobile,
     showPopup,
     setShowPopup,
+    selectedPopUp,
+    setSelectedPopUp
   } = useGeneralStore();
 
   const Links = [
@@ -36,6 +37,7 @@ export const LeftSideBar = () => {
       onClick: () => {
         setShowPopup(true);
         setIsCollapsed(true);
+        setSelectedPopUp("following");  
       },
     },
     { icon: <IoPersonCircle />, label: "Profile", href: "/profile" },
@@ -114,7 +116,8 @@ export const LeftSideBar = () => {
 
           {showPopup && (
             <div className="popup-sidebar w-80 h-screen bg-gray-900 border-r border-gray-800 z-50 shadow-2xl">
-              <SearchPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>
+              {(selectedPopUp === "search") && <SearchPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
+              {(selectedPopUp === "following") && <FollowersPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
             </div>
           )}
         </div>
