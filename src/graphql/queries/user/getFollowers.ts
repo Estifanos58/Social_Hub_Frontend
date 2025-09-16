@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_FOLLOWERS = gql`
-    query GetFollowers(getFollowers: { limit: Int!, offset: Int! }) {
-        GetFollowers(getFollowers: { limit: $limit, offset: $offset }) {
+    query GetFollowers($take: Int!, $skip: Int! ) {
+        GetFollowers(getFollowers: { take: $take, skip: $skip }) {
             users {
                 id
                 firstname
@@ -11,6 +11,7 @@ export const GET_FOLLOWERS = gql`
             }
             totalFollowers
             totalFollowing
+            hasMore
     }
 }
 `

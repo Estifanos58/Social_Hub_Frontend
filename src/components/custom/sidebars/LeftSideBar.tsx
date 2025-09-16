@@ -33,11 +33,11 @@ export const LeftSideBar = () => {
     { icon: <IoMdTrendingUp />, label: "Trending" },
     {
       icon: <RiUserFollowLine />,
-      label: "Following",
+      label: "Connections",
       onClick: () => {
         setShowPopup(true);
         setIsCollapsed(true);
-        setSelectedPopUp("following");  
+        setSelectedPopUp("connections");  
       },
     },
     { icon: <IoPersonCircle />, label: "Profile", href: "/profile" },
@@ -117,7 +117,7 @@ export const LeftSideBar = () => {
           {showPopup && (
             <div className="popup-sidebar w-80 h-screen bg-gray-900 border-r border-gray-800 z-50 shadow-2xl">
               {(selectedPopUp === "search") && <SearchPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
-              {(selectedPopUp === "following") && <FollowersPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
+              {(selectedPopUp === "connections") && <FollowersPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
             </div>
           )}
         </div>
