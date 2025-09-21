@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const GET_POSTS = gql`
-    query GetPosts ($take: number, $cursor?: String) {
+    query GetPosts ($take: Float!, $cursor: String!) {
         getPosts (take: $take, cursor: $cursor) {
             posts {
                 id
@@ -15,10 +15,15 @@ export const GET_POSTS = gql`
                     avatarUrl
                     lastSeenAt
                 }
+                commentsCount
+                reactionsCount
                 images {
                     id
                     url
                     postId
                 }
             }
-            hasMore`;
+            hasMore
+        }    
+}
+`;

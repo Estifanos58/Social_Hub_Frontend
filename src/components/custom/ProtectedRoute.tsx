@@ -22,7 +22,7 @@ export default function ProtectedRoute({
     if (data?.getme) {
       setUser(data.getme as any);
     } else {
-      router.replace("/auth"); // redirect when no user
+      return router.replace("/auth"); // redirect when no user
     }
   }, [loading, data, error, setUser, router]);
 

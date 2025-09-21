@@ -1,10 +1,28 @@
+'use client';
+
 import RightSideBar from "@/components/custom/sidebars/RightSideBar";
-import TopBar from "@/components/custom/TopBar";
 import { PostDisplay } from "@/components/shared/PostDisplay";
+import { PaginatedPostsDto } from "@/gql/graphql";
+import { GET_POSTS } from "@/graphql/queries/post/GetPosts";
 import { posts } from "@/lib/dummy";
+import { useQuery } from "@apollo/client/react";
 import React from "react";
 
 function MainPage() {
+  const {loading, data} = useQuery<PaginatedPostsDto>(GET_POSTS, {
+    variables: { take: 10, cursor: "" },
+  })
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!data) {
+    return <div>No data available</div>;
+  }
+
+  
+
   return (
     <div className="flex-1 overflow-clip bg-gray-900 overflow-y-auto text-white">
       <div className="sticky top-0 z-50 bg-gray-900 shadow-md">
