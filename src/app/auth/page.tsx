@@ -92,6 +92,7 @@ export default function AuthPage() {
             if (data?.login.user) {
               setUser(data.login.user);
               toast.success("Login successful!");
+              navigate.push("/");
             }
           },
         }).catch((err) => {

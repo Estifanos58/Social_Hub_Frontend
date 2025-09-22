@@ -12,6 +12,7 @@ export interface Post {
     };
     commentsCount: number;
     reactionsCount: number;
+    userReaction?: string | null; 
     images: {
         id: string;
         url: string;

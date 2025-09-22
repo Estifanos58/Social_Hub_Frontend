@@ -8,6 +8,7 @@ import { SEND_RESET_CODE } from "@/graphql/mutations/auth/Sendresetcode";
 import { RESET_PASSWORD } from "@/graphql/mutations/auth/Resetpassword";
 import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 
 
@@ -25,6 +26,7 @@ export default function ForgotPasswordPage() {
 
   const [sendResetCode, { loading: sending }] = useMutation(SEND_RESET_CODE);
   const [resetPassword, { loading: resetting }] = useMutation(RESET_PASSWORD);
+  const router = useRouter();
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +92,7 @@ export default function ForgotPasswordPage() {
           if (data?.resetPassword.user) {
             setUser(data.resetPassword.user)
             toast.success("✅ Password reset successfully!");
+            router.push('/')
             // redirect to login maybe
           } else {
             toast.error("Password reset failed. Try again.");

@@ -17,6 +17,7 @@ export const GET_POSTS = gql`
                 }
                 commentsCount
                 reactionsCount
+                userReaction
                 images {
                     id
                     url

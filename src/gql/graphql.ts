@@ -67,7 +67,22 @@ export type CommentDto = {
   post?: Maybe<PostDto>;
   postId: Scalars['String']['output'];
   replies?: Maybe<Array<CommentDto>>;
+  repliesHasNextPage?: Maybe<Scalars['Boolean']['output']>;
+  replyCount?: Maybe<Scalars['Float']['output']>;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type CommentEdgeDto = {
+  __typename?: 'CommentEdgeDto';
+  cursor: Scalars['String']['output'];
+  node: CommentDto;
+};
+
+export type CommentRepliesConnectionDto = {
+  __typename?: 'CommentRepliesConnectionDto';
+  edges: Array<CommentEdgeDto>;
+  pageInfo: PageInfoDto;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type CreateCommentDto = {
@@ -159,6 +174,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   UnfollowUser: Scalars['String']['output'];
   UpdateUser: UserDto;
+  addReaction: Scalars['Boolean']['output'];
   createComment: CreateCommentResponse;
   createPost: Scalars['String']['output'];
   deletePost: Scalars['String']['output'];
@@ -167,6 +183,7 @@ export type Mutation = {
   login: UserResponse;
   logout: Scalars['String']['output'];
   register: UserResponse;
+  removeReaction: Scalars['Boolean']['output'];
   resetPassword: UserResponse;
   verifyEmail: UserResponse;
 };
@@ -179,6 +196,12 @@ export type MutationUnfollowUserArgs = {
 
 export type MutationUpdateUserArgs = {
   updateUser: UpdateUserDto;
+};
+
+
+export type MutationAddReactionArgs = {
+  postId: Scalars['String']['input'];
+  type: Scalars['String']['input'];
 };
 
 
@@ -217,6 +240,11 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationRemoveReactionArgs = {
+  postId: Scalars['String']['input'];
+};
+
+
 export type MutationResetPasswordArgs = {
   newPassword: Scalars['String']['input'];
   token: Scalars['String']['input'];
@@ -225,6 +253,12 @@ export type MutationResetPasswordArgs = {
 
 export type MutationVerifyEmailArgs = {
   token: Scalars['String']['input'];
+};
+
+export type PageInfoDto = {
+  __typename?: 'PageInfoDto';
+  endCursor?: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
 };
 
 export type PaginatedPostsDto = {
@@ -239,6 +273,13 @@ export type Post = {
   id: Scalars['String']['output'];
   imageUrl: Scalars['String']['output'];
   likes: Scalars['Float']['output'];
+};
+
+export type PostCommentsConnectionDto = {
+  __typename?: 'PostCommentsConnectionDto';
+  edges: Array<CommentEdgeDto>;
+  pageInfo: PageInfoDto;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type PostDto = {
@@ -281,9 +322,11 @@ export type Query = {
   GetFollowing: GetFollowersDto;
   GetUser: UserProfileDto;
   GetUsersToFollow: GetUsersToFollowDto;
+  commentReplies: CommentRepliesConnectionDto;
   getPost: GetPostType;
   getPosts: PaginatedPostsDto;
   getme: UserDto;
+  postComments: PostCommentsConnectionDto;
 };
 
 
@@ -307,6 +350,15 @@ export type QueryGetUsersToFollowArgs = {
 };
 
 
+export type QueryCommentRepliesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  commentId: Scalars['String']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']['input']>;
+  secondLevelLimit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryGetPostArgs = {
   postId: Scalars['String']['input'];
 };
@@ -315,6 +367,15 @@ export type QueryGetPostArgs = {
 export type QueryGetPostsArgs = {
   cursor: Scalars['String']['input'];
   take: Scalars['Float']['input'];
+};
+
+
+export type QueryPostCommentsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directRepliesLimit?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  postId: Scalars['String']['input'];
+  secondLevelLimit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ReactionDto = {
@@ -470,6 +531,25 @@ export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetMeQuery = { __typename?: 'Query', getme: { __typename?: 'UserDto', id: string, email: string, firstname: string, lastname?: string | null, avatarUrl?: string | null, lastSeenAt?: any | null, createdAt: any, updatedAt: any, verified: boolean, isPrivate: boolean, bio?: string | null } };
 
+export type GetPostCommentsQueryVariables = Exact<{
+  postId: Scalars['String']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  directRepliesLimit?: InputMaybe<Scalars['Int']['input']>;
+  secondLevelLimit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetPostCommentsQuery = { __typename?: 'Query', postComments: { __typename?: 'PostCommentsConnectionDto', totalCount: number, edges: Array<{ __typename?: 'CommentEdgeDto', cursor: string, node: { __typename?: 'CommentDto', id: string, content: string, createdAt: any, replyCount?: number | null, repliesHasNextPage?: boolean | null, createdBy?: { __typename?: 'UserDto', id: string, firstname: string, lastname?: string | null, avatarUrl?: string | null } | null, replies?: Array<{ __typename?: 'CommentDto', id: string, content: string, replyCount?: number | null, repliesHasNextPage?: boolean | null, createdBy?: { __typename?: 'UserDto', id: string, firstname: string, avatarUrl?: string | null } | null, replies?: Array<{ __typename?: 'CommentDto', id: string, content: string, createdBy?: { __typename?: 'UserDto', id: string, firstname: string, avatarUrl?: string | null } | null }> | null }> | null } }>, pageInfo: { __typename?: 'PageInfoDto', endCursor?: string | null, hasNextPage: boolean } } };
+
+export type GetPostsQueryVariables = Exact<{
+  take: Scalars['Float']['input'];
+  cursor: Scalars['String']['input'];
+}>;
+
+
+export type GetPostsQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsDto', hasMore: boolean, posts: Array<{ __typename?: 'PostFeedDto', id: string, content: string, createdAt: any, updatedAt: any, commentsCount: number, reactionsCount: number, createdBy?: { __typename?: 'UserDto', id: string, firstname: string, lastname?: string | null, avatarUrl?: string | null, lastSeenAt?: any | null } | null, images?: Array<{ __typename?: 'PostImageDto', id: string, url: string, postId: string }> | null }> } };
+
 export type GetFollowersQueryVariables = Exact<{
   take: Scalars['Int']['input'];
   skip: Scalars['Int']['input'];
@@ -512,6 +592,8 @@ export const DeletePostDocument = {"kind":"Document","definitions":[{"kind":"Ope
 export const FollowUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FollowUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"followingId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"followUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"followingId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"followingId"}}}]}]}}]} as unknown as DocumentNode<FollowUserMutation, FollowUserMutationVariables>;
 export const UpdateProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"firstname"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"lastname"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"bio"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"avatarUrl"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"isPrivate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"twoFactorEnabled"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"UpdateUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"updateUser"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"firstname"},"value":{"kind":"Variable","name":{"kind":"Name","value":"firstname"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"lastname"},"value":{"kind":"Variable","name":{"kind":"Name","value":"lastname"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"bio"},"value":{"kind":"Variable","name":{"kind":"Name","value":"bio"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"avatarUrl"},"value":{"kind":"Variable","name":{"kind":"Name","value":"avatarUrl"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"isPrivate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"isPrivate"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"twoFactorEnabled"},"value":{"kind":"Variable","name":{"kind":"Name","value":"twoFactorEnabled"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"bio"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}},{"kind":"Field","name":{"kind":"Name","value":"isPrivate"}}]}}]}}]} as unknown as DocumentNode<UpdateProfileMutation, UpdateProfileMutationVariables>;
 export const GetMeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMe"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getme"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}},{"kind":"Field","name":{"kind":"Name","value":"lastSeenAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"verified"}},{"kind":"Field","name":{"kind":"Name","value":"isPrivate"}},{"kind":"Field","name":{"kind":"Name","value":"bio"}}]}}]}}]} as unknown as DocumentNode<GetMeQuery, GetMeQueryVariables>;
+export const GetPostCommentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPostComments"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"postId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"5"}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"directRepliesLimit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"3"}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"secondLevelLimit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"2"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"postComments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"postId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"postId"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"directRepliesLimit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"directRepliesLimit"}}},{"kind":"Argument","name":{"kind":"Name","value":"secondLevelLimit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"secondLevelLimit"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"replyCount"}},{"kind":"Field","name":{"kind":"Name","value":"repliesHasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"replies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"replyCount"}},{"kind":"Field","name":{"kind":"Name","value":"repliesHasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"replies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"cursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"endCursor"}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<GetPostCommentsQuery, GetPostCommentsQueryVariables>;
+export const GetPostsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPosts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPosts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"cursor"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"posts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}},{"kind":"Field","name":{"kind":"Name","value":"lastSeenAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"commentsCount"}},{"kind":"Field","name":{"kind":"Name","value":"reactionsCount"}},{"kind":"Field","name":{"kind":"Name","value":"images"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"postId"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"hasMore"}}]}}]}}]} as unknown as DocumentNode<GetPostsQuery, GetPostsQueryVariables>;
 export const GetFollowersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetFollowers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"GetFollowers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"getFollowers"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalFollowers"}},{"kind":"Field","name":{"kind":"Name","value":"totalFollowing"}},{"kind":"Field","name":{"kind":"Name","value":"hasMore"}}]}}]}}]} as unknown as DocumentNode<GetFollowersQuery, GetFollowersQueryVariables>;
 export const GetFollowingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetFollowing"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"GetFollowing"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"getFollowing"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalFollowers"}},{"kind":"Field","name":{"kind":"Name","value":"totalFollowing"}},{"kind":"Field","name":{"kind":"Name","value":"hasMore"}}]}}]}}]} as unknown as DocumentNode<GetFollowingQuery, GetFollowingQueryVariables>;
 export const GetUserProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"GetUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}},{"kind":"Field","name":{"kind":"Name","value":"firstname"}},{"kind":"Field","name":{"kind":"Name","value":"lastname"}},{"kind":"Field","name":{"kind":"Name","value":"bio"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"isPrivate"}}]}},{"kind":"Field","name":{"kind":"Name","value":"followers"}},{"kind":"Field","name":{"kind":"Name","value":"following"}},{"kind":"Field","name":{"kind":"Name","value":"posts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"likes"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}}]}}]}}]}}]} as unknown as DocumentNode<GetUserProfileQuery, GetUserProfileQueryVariables>;
@@ -576,7 +658,22 @@ export type CommentDto = {
   post?: Maybe<PostDto>;
   postId: Scalars['String']['output'];
   replies?: Maybe<Array<CommentDto>>;
+  repliesHasNextPage?: Maybe<Scalars['Boolean']['output']>;
+  replyCount?: Maybe<Scalars['Float']['output']>;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type CommentEdgeDto = {
+  __typename?: 'CommentEdgeDto';
+  cursor: Scalars['String']['output'];
+  node: CommentDto;
+};
+
+export type CommentRepliesConnectionDto = {
+  __typename?: 'CommentRepliesConnectionDto';
+  edges: Array<CommentEdgeDto>;
+  pageInfo: PageInfoDto;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type CreateCommentDto = {
@@ -668,6 +765,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   UnfollowUser: Scalars['String']['output'];
   UpdateUser: UserDto;
+  addReaction: Scalars['Boolean']['output'];
   createComment: CreateCommentResponse;
   createPost: Scalars['String']['output'];
   deletePost: Scalars['String']['output'];
@@ -676,6 +774,7 @@ export type Mutation = {
   login: UserResponse;
   logout: Scalars['String']['output'];
   register: UserResponse;
+  removeReaction: Scalars['Boolean']['output'];
   resetPassword: UserResponse;
   verifyEmail: UserResponse;
 };
@@ -688,6 +787,12 @@ export type MutationUnfollowUserArgs = {
 
 export type MutationUpdateUserArgs = {
   updateUser: UpdateUserDto;
+};
+
+
+export type MutationAddReactionArgs = {
+  postId: Scalars['String']['input'];
+  type: Scalars['String']['input'];
 };
 
 
@@ -726,6 +831,11 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationRemoveReactionArgs = {
+  postId: Scalars['String']['input'];
+};
+
+
 export type MutationResetPasswordArgs = {
   newPassword: Scalars['String']['input'];
   token: Scalars['String']['input'];
@@ -734,6 +844,12 @@ export type MutationResetPasswordArgs = {
 
 export type MutationVerifyEmailArgs = {
   token: Scalars['String']['input'];
+};
+
+export type PageInfoDto = {
+  __typename?: 'PageInfoDto';
+  endCursor?: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
 };
 
 export type PaginatedPostsDto = {
@@ -748,6 +864,13 @@ export type Post = {
   id: Scalars['String']['output'];
   imageUrl: Scalars['String']['output'];
   likes: Scalars['Float']['output'];
+};
+
+export type PostCommentsConnectionDto = {
+  __typename?: 'PostCommentsConnectionDto';
+  edges: Array<CommentEdgeDto>;
+  pageInfo: PageInfoDto;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type PostDto = {
@@ -790,9 +913,11 @@ export type Query = {
   GetFollowing: GetFollowersDto;
   GetUser: UserProfileDto;
   GetUsersToFollow: GetUsersToFollowDto;
+  commentReplies: CommentRepliesConnectionDto;
   getPost: GetPostType;
   getPosts: PaginatedPostsDto;
   getme: UserDto;
+  postComments: PostCommentsConnectionDto;
 };
 
 
@@ -816,6 +941,15 @@ export type QueryGetUsersToFollowArgs = {
 };
 
 
+export type QueryCommentRepliesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  commentId: Scalars['String']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']['input']>;
+  secondLevelLimit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryGetPostArgs = {
   postId: Scalars['String']['input'];
 };
@@ -824,6 +958,15 @@ export type QueryGetPostArgs = {
 export type QueryGetPostsArgs = {
   cursor: Scalars['String']['input'];
   take: Scalars['Float']['input'];
+};
+
+
+export type QueryPostCommentsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directRepliesLimit?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  postId: Scalars['String']['input'];
+  secondLevelLimit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ReactionDto = {
