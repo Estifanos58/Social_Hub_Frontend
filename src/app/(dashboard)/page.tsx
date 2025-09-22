@@ -9,7 +9,7 @@ import { useQuery } from "@apollo/client/react";
 import React from "react";
 
 function MainPage() {
-  const {loading, data} = useQuery<PaginatedPostsDto>(GET_POSTS, {
+  const {loading, data} = useQuery<any>(GET_POSTS, {
     variables: { take: 10, cursor: "" },
   })
 
@@ -21,6 +21,8 @@ function MainPage() {
     return <div>No data available</div>;
   }
 
+console.log(data)
+
   
 
   return (
@@ -30,7 +32,7 @@ function MainPage() {
       </div>
       <div className="w-full flex justify-between ">
         <div className="flex-1 flex bg-gray-900 flex-col items-center">
-          {posts.map((post) => (
+          {data.getPosts.posts.map((post:any) => (
             <PostDisplay key={post.id} post={post} />
           ))}
         </div>
