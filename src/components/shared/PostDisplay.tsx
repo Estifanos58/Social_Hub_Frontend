@@ -19,6 +19,28 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 
 export const PostDisplay = ({ post }: { post: Post }) => {
+  // Utility: format ISO timestamp into compact relative time (e.g., 5d, 2w, 1min, 30s)
+  const formatRelative = (iso: string): string => {
+    if (!iso) return "";
+    const date = new Date(iso);
+    if (isNaN(date.getTime())) return "";
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const sec = Math.floor(diffMs / 1000);
+    if (sec < 60) return `${sec}s`;
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min}min`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr}h`;
+    const day = Math.floor(hr / 24);
+    if (day < 7) return `${day}d`;
+    const week = Math.floor(day / 7);
+    if (week < 5) return `${week}w`;
+    const month = Math.floor(day / 30); // approximate
+    if (month < 12) return `${month}mo`;
+    const year = Math.floor(day / 365); // approximate
+    return `${year}y`;
+  };
   const sliderSettings = {
     dots: true,
     infinite: false,
@@ -185,10 +207,13 @@ export const PostDisplay = ({ post }: { post: Post }) => {
             <p className="font-semibold text-sm">{post.createdBy.firstname}</p>
           </div>
         </div>
-        <span className="text-xs text-gray-500">
+        <span
+          className="text-xs text-gray-500"
+          title={post.updatedAt ? `Edited at ${post.updatedAt}` : post.createdAt}
+        >
           {post.updatedAt
-            ? `Edited ${post.updatedAt}`
-            : post.createdAt}
+            ? `Edited ${formatRelative(post.updatedAt)}`
+            : formatRelative(post.createdAt)}
         </span>
       </div>
 

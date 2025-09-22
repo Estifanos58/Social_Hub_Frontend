@@ -46,7 +46,7 @@ export const LeftSideBar = () => {
   // Handle resize for mobile view
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth <= 600) {
+      if (window.innerWidth <= 700) {
         setMobile(true);
         setIsCollapsed(true); // optional: mobile is always collapsed
       } else if (window.innerWidth <= 1024) {
@@ -70,9 +70,9 @@ export const LeftSideBar = () => {
       <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 flex justify-around items-center py-2 z-50">
         {Links.map((link) => (
           <Link href={link.href || "#"} key={link.label}>
-            <div className="flex flex-col items-center text-gray-300 hover:text-amber-400">
+            <div className="flex flex-col items-center text-gray-300 hover:text-amber-400" aria-label={link.label}>
               <span className="text-2xl">{link.icon}</span>
-              <span className="text-xs mt-1">{link.label}</span>
+              {/* Label intentionally hidden on mobile per requirement */}
             </div>
           </Link>
         ))}
