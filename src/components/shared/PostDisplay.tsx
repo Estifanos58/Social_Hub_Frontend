@@ -11,6 +11,42 @@ import { useGeneralStore } from "@/store/generalStore";
 import { ReactionBar } from "./ReactionBar";
 
 export const PostDisplay = ({ post }: { post: Post }) => {
+  // Custom larger arrows for the image slider
+  interface ArrowProps {
+    className?: string;
+    style?: React.CSSProperties;
+    onClick?: () => void;
+  }
+
+  const ArrowBase: React.FC<ArrowProps & { direction: 'left' | 'right' }> = ({ direction, onClick }) => (
+    <button
+      type="button"
+      aria-label={direction === 'left' ? 'Previous image' : 'Next image'}
+      onClick={onClick}
+      className={`!flex !items-center !justify-center !w-12 !h-12 !bg-black/50 hover:!bg-black/70 !backdrop-blur !rounded-full !z-20 !text-white !transition !duration-200 !border !border-white/20 !absolute top-1/2 -translate-y-1/2 ${direction === 'left' ? '!left-2' : '!right-2'}`}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-6 h-6"
+      >
+        {direction === 'left' ? (
+          <path d="M15 18l-6-6 6-6" />
+        ) : (
+          <path d="M9 18l6-6-6-6" />
+        )}
+      </svg>
+    </button>
+  );
+
+  const NextArrow: React.FC<ArrowProps> = (props) => <ArrowBase direction="right" {...props} />;
+  const PrevArrow: React.FC<ArrowProps> = (props) => <ArrowBase direction="left" {...props} />;
+
   // Utility: format ISO timestamp into compact relative time (e.g., 5d, 2w, 1min, 30s)
   const sliderSettings = {
     dots: true,
@@ -19,6 +55,8 @@ export const PostDisplay = ({ post }: { post: Post }) => {
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: true,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
   };
 
   const {setSelectedPost} = useGeneralStore();
@@ -52,7 +90,7 @@ export const PostDisplay = ({ post }: { post: Post }) => {
 
       {/* Images */}
       {post.images.length > 0 && (
-        <div className="mb-3">
+        <div className="mb-3 relative group">
           <Slider {...sliderSettings}>
             {post.images.map((img: any) => (
               <div key={img.id} className="px-1">

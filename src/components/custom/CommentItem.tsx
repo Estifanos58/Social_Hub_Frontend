@@ -43,22 +43,22 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   return (
     <div className="flex gap-3 group">
       <Avatar className="w-8 h-8 flex-shrink-0">
-        <AvatarImage src={comment.createdBy.avatarUrl || "/placeholder.svg"} />
+        <AvatarImage src={comment?.createdBy.avatarUrl || "/placeholder.svg"} />
         <AvatarFallback className="bg-gray-700 text-white text-[10px]">
-          {comment.createdBy.firstname?.[0]}
-          {comment.createdBy.lastname?.[0]}
+          {comment?.createdBy.firstname?.[0]}
+          {comment?.createdBy.lastname?.[0]}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-white font-medium text-xs">
-            {comment.createdBy.firstname?.toLowerCase()}
-            {comment.createdBy.lastname?.toLowerCase()}
+            {comment?.createdBy.firstname?.toLowerCase()}
+            {comment?.createdBy.lastname?.toLowerCase()}
           </span>
-          <span className="text-gray-500 text-[10px]">{formatRelative(comment.createdAt)}</span>
+          <span className="text-gray-500 text-[10px]">{formatRelative(comment?.createdAt)}</span>
         </div>
         <p className="text-xs text-gray-200 mt-1 leading-snug whitespace-pre-wrap">
-          {comment.content}
+          {comment?.content}
         </p>
         <div className="flex items-center gap-4 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
           {depth < maxDepth && (
@@ -75,18 +75,18 @@ export const CommentItem: React.FC<CommentItemProps> = ({
           <div className="mt-2">
             <CommentSection
               postId={postId}
-              parentId={comment.id}
+              parentId={comment?.id}
               compact
               autoFocus
               placeholder="Reply..."
               onCreated={(created: any) => {
-                if (onReplyAdded) onReplyAdded(comment.id, created as any);
+                if (onReplyAdded) onReplyAdded(comment?.id, created as any);
                 setShowReply(false);
               }}
             />
           </div>
         )}
-        {comment.replies && comment.replies.length > 0 && (
+        {comment?.replies && comment?.replies.length > 0 && (
           <CollapsibleReplies
             comment={comment}
             postId={postId}
