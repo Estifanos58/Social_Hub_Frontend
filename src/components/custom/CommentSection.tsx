@@ -8,22 +8,46 @@ import { Smile } from "lucide-react";
 import { EmojiPicker } from "@ferrucc-io/emoji-picker";
 import { useMutation } from "@apollo/client/react";
 import { CREATE_COMMENT_MUTATION } from "@/graphql/mutations/comment/CreateComment";
+import { toast } from "sonner";
+interface CreatedComment {
+  id: string;
+  content: string;
+  postId: string;
+  createdAt: string;
+  parentId?: string | null;
+  createdBy?: {
+    id: string;
+    firstname?: string;
+    lastname?: string;
+    avatarUrl?: string;
+  };
+}
 
 interface CommentSectionProps {
   postId: string;
-  onSubmitComment?: (content: string) => void;
+  parentId?: string; // for replies
+  onCreated?: (comment: CreatedComment) => void;
+  autoFocus?: boolean;
+  placeholder?: string;
+  compact?: boolean;
 }
 
 export const CommentSection = ({
   postId,
-  onSubmitComment,
+  parentId,
+  onCreated,
+  autoFocus = false,
+  placeholder = "Write a comment...",
+  compact = false,
 }: CommentSectionProps) => {
   const [comment, setComment] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
-  const [ createComment, { loading } ] = useMutation(CREATE_COMMENT_MUTATION)
+  interface CreateCommentResult { createComment: CreatedComment }
+  interface CreateCommentVars { postId: string; content: string; parentId?: string | null }
+  const [ createComment, { loading } ] = useMutation<CreateCommentResult, CreateCommentVars>(CREATE_COMMENT_MUTATION)
 
   // Auto-resize textarea helper
   const adjustTextareaHeight = () => {
@@ -74,19 +98,24 @@ export const CommentSection = ({
     }, 0);
   };
 
-  const handleSubmit = async () => {
-    if (!comment.trim() || isSubmitting) return;
-    createComment({variables: { postId, content: comment, parentId: "" }})
-    setIsSubmitting(true);
-    try {
-      await onSubmitComment?.(comment.trim());
-      setComment("");
-    } catch (error) {
-      console.error("Failed to submit comment:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    const handleSubmit = async () => {
+      if (!comment.trim() || isSubmitting) return;
+      setIsSubmitting(true);
+      try {
+        const { data } = await createComment({
+          variables: { postId, content: comment.trim(), parentId: parentId || null },
+        });
+        const created = data?.createComment;
+        if (created) onCreated?.(created);
+        setComment("");
+          toast.success(parentId ? "Reply added" : "Comment posted");
+        } catch (error) {
+        console.error("Failed to submit comment:", error);
+          toast.error("Failed to post comment");
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
@@ -96,7 +125,12 @@ export const CommentSection = ({
   };
 
   return (
-    <div className="mt-4 rounded-xl border border-gray-800/80 bg-gradient-to-b from-gray-900/80 to-gray-900/40 backdrop-blur-sm p-4 text-gray-200 shadow-inner shadow-black/40 transition-colors">
+    <div className={
+      (compact
+        ? "mt-2 rounded-lg border border-gray-800/60 bg-gray-900/70 p-3"
+        : "mt-4 rounded-xl border border-gray-800/80 bg-gradient-to-b from-gray-900/80 to-gray-900/40 p-4") +
+      " text-gray-200 shadow-inner shadow-black/40 transition-colors"
+    }>
       <div className="relative">
         <div className="flex items-center gap-3">
           <div className="flex-1 relative group">
@@ -108,8 +142,9 @@ export const CommentSection = ({
                 requestAnimationFrame(adjustTextareaHeight);
               }}
               onKeyDown={handleKeyDown}
-              placeholder="Write a comment..."
-              className="min-h-[48px] text-2xl max-h-[100px] leading-relaxed resize-none pr-12 bg-gray-800/70 border border-gray-700/70 hover:border-gray-600 focus:border-amber-400/70 focus:ring-2 focus:ring-amber-400/30 placeholder:text-gray-500 rounded-lg shadow-sm focus:shadow-md transition-all duration-200 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-700/70 hover:scrollbar-thumb-gray-600"
+              placeholder={placeholder}
+              autoFocus={autoFocus}
+              className={(compact ? "min-h-[40px] text-sm" : "min-h-[48px] text-2xl") + " max-h-[140px] leading-relaxed resize-none pr-12 bg-gray-800/70 border border-gray-700/70 hover:border-gray-600 focus:border-amber-400/70 focus:ring-2 focus:ring-amber-400/30 placeholder:text-gray-500 rounded-lg shadow-sm focus:shadow-md transition-all duration-200 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-700/70 hover:scrollbar-thumb-gray-600"}
               rows={2}
               style={{ overflowY: "auto" }}
             />
@@ -165,13 +200,13 @@ export const CommentSection = ({
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="bg-gray-900 h-full hover:bg-gay-800 text-white border-1 border-white shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+              className={(compact ? "bg-gray-800 h-9 px-3 text-xs" : "bg-gray-900 h-full") + " hover:bg-gray-800 text-white shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all"}
             >
               {isSubmitting ? "Posting..." : "Post"}
             </Button>
           )}
         </div>
-        {comment.trim() && (
+        {comment.trim() && !compact && (
           <div className="text-xs text-gray-500 mt-2 pl-0.5 select-none">
             Press Cmd+Enter (Mac) or Ctrl+Enter (Windows) to post
           </div>

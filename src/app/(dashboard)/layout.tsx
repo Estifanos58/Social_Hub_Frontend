@@ -1,4 +1,5 @@
 import { LeftSideBar } from "@/components/custom/sidebars/LeftSideBar";
+import Modal from "@/components/shared/Modal";
 
 
 export default function DashboardLayout({
@@ -11,6 +12,7 @@ export default function DashboardLayout({
           {/* Left Sidebar */}
           <LeftSideBar />
           {children}
+          <Modal/>
     </div>
     )
 }

@@ -18,4 +18,17 @@ export interface Post {
         url: string;
         postId: string;
     }[];
+     comments: {
+        id: string;
+        content: string;
+        createdAt: string;
+        createdBy: {
+            id: string;
+            firstname: string;
+            lastname: string;
+            avatarUrl: string;
+        },
+        parentId: string | null;    
+       updatedAt: string;
+    }[]
 } 
