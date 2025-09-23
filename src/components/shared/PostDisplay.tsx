@@ -17,30 +17,13 @@ import { MdOutlineAddReaction } from "react-icons/md";
 import React, { useState, useRef, useEffect } from "react";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
+import { CommentSection } from "../custom/CommentSection";
+import { ADD_REACTION_MUTATION } from "@/graphql/mutations/post/AddReaction";
+import { REMOVE_REACTION_MUTATION } from "@/graphql/mutations/post/RemoveReaction";
+import { formatRelative } from "@/lib/utils";
 
 export const PostDisplay = ({ post }: { post: Post }) => {
   // Utility: format ISO timestamp into compact relative time (e.g., 5d, 2w, 1min, 30s)
-  const formatRelative = (iso: string): string => {
-    if (!iso) return "";
-    const date = new Date(iso);
-    if (isNaN(date.getTime())) return "";
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const sec = Math.floor(diffMs / 1000);
-    if (sec < 60) return `${sec}s`;
-    const min = Math.floor(sec / 60);
-    if (min < 60) return `${min}min`;
-    const hr = Math.floor(min / 60);
-    if (hr < 24) return `${hr}h`;
-    const day = Math.floor(hr / 24);
-    if (day < 7) return `${day}d`;
-    const week = Math.floor(day / 7);
-    if (week < 5) return `${week}w`;
-    const month = Math.floor(day / 30); // approximate
-    if (month < 12) return `${month}mo`;
-    const year = Math.floor(day / 365); // approximate
-    return `${year}y`;
-  };
   const sliderSettings = {
     dots: true,
     infinite: false,
@@ -86,18 +69,6 @@ export const PostDisplay = ({ post }: { post: Post }) => {
   // Keeps an authoritative count that mirrors server after each commit
   const originalCountRef = useRef<number>(post.reactionsCount || 0);
 
-  // Mutations
-  const ADD_REACTION_MUTATION = gql`
-    mutation AddReaction($postId: String!, $type: String!) {
-      addReaction(postId: $postId, type: $type)
-    }
-  `;
-
-  const REMOVE_REACTION_MUTATION = gql`
-    mutation RemoveReaction($postId: String!) {
-      removeReaction(postId: $postId)
-    }
-  `;
 
   const [addReaction] = useMutation(ADD_REACTION_MUTATION);
   const [removeReaction] = useMutation(REMOVE_REACTION_MUTATION);
@@ -310,7 +281,11 @@ export const PostDisplay = ({ post }: { post: Post }) => {
         <button className="hover:text-green-400 flex items-center gap-2 text-2xl">
           <FaRegCommentDots /> {post.commentsCount}
         </button>
+
       </div>
+        <div>
+          <CommentSection postId={post.id} />
+        </div>
     </div>
   );
 };
