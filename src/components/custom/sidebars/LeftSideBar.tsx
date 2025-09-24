@@ -14,8 +14,15 @@ import CreatePost from "../CreatePost";
 import SearchPopUp from "./popUps/SearchPopUp";
 import FollowersPopUp from "./popUps/FollowersPopUp";
 import NotificationsPopUp from "./popUps/NotificationsPopUp";
+import { useQuery } from "@apollo/client/react";
+import { GET_UNREAD_NOTIFICATIONS_COUNT } from "@/graphql/queries/notification/getUnreadNotificationsCount";
 
 export const LeftSideBar = () => {
+  // Unread notifications count (poll every 20s)
+  const { data: unreadData } = useQuery<{ unreadNotificationsCount: number }>(GET_UNREAD_NOTIFICATIONS_COUNT, {
+    pollInterval: 20000,
+  });
+  const unreadCount = unreadData?.unreadNotificationsCount ?? 0;
   const {
     isCollapsed,
     setIsCollapsed,
@@ -30,7 +37,16 @@ export const LeftSideBar = () => {
   const Links = [
     { icon: <BiHomeAlt2 />, label: "Home", href: "/" },
     { 
-      icon: <IoMdNotificationsOutline />, 
+      icon: (
+        <span className="relative">
+          <IoMdNotificationsOutline />
+          {unreadCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center font-bold border-2 border-gray-900">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </span>
+      ),
       label: "Notifications",
       onClick: () => {
         setShowPopup(true);
@@ -79,8 +95,19 @@ export const LeftSideBar = () => {
       <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 flex justify-around items-center py-2 z-50">
         {Links.map((link) => (
           <Link href={link.href || "#"} key={link.label}>
-            <div className="flex flex-col items-center text-gray-300 hover:text-amber-400" aria-label={link.label}>
-              <span className="text-2xl">{link.icon}</span>
+            <div className="flex flex-col items-center text-gray-300 hover:text-amber-400 relative" aria-label={link.label}>
+              <span className="text-2xl">
+                {link.label === "Notifications" ? (
+                  <span className="relative">
+                    <IoMdNotificationsOutline />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center font-bold border-2 border-gray-900">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </span>
+                ) : link.icon}
+              </span>
               {/* Label intentionally hidden on mobile per requirement */}
             </div>
           </Link>

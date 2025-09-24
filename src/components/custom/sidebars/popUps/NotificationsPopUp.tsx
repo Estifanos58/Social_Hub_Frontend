@@ -97,6 +97,7 @@ function NotificationsPopUp({ setShowPopup, setIsCollapsed }: NotificationsPopUp
         ))}
 
         {/* Items */}
+
         {!loading && list.map((n) => (
           <div key={n.id} className="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition-colors">
             <Image
@@ -110,6 +111,9 @@ function NotificationsPopUp({ setShowPopup, setIsCollapsed }: NotificationsPopUp
               <p className="text-white text-sm">{formatTitle(n)}</p>
               <div className="text-gray-400 text-xs mt-0.5 truncate">
                 {n.post?.content || n.comment?.content || ''}
+              </div>
+              <div className="text-gray-500 text-[10px] mt-1">
+                {new Date(n.createdAt).toLocaleString()}
               </div>
             </div>
             {!n.isRead && <span className="w-2 h-2 rounded-full bg-blue-400" />}
