@@ -13,6 +13,7 @@ import { SidebarItem } from "../SidebarItem";
 import CreatePost from "../CreatePost";
 import SearchPopUp from "./popUps/SearchPopUp";
 import FollowersPopUp from "./popUps/FollowersPopUp";
+import NotificationsPopUp from "./popUps/NotificationsPopUp";
 
 export const LeftSideBar = () => {
   const {
@@ -28,7 +29,15 @@ export const LeftSideBar = () => {
 
   const Links = [
     { icon: <BiHomeAlt2 />, label: "Home", href: "/" },
-    { icon: <IoMdNotificationsOutline />, label: "Notifications" },
+    { 
+      icon: <IoMdNotificationsOutline />, 
+      label: "Notifications",
+      onClick: () => {
+        setShowPopup(true);
+        setIsCollapsed(true);
+        setSelectedPopUp("notifications");
+      }
+     },
     { icon: <AiOutlineMessage />, label: "Messages" },
     { icon: <IoMdTrendingUp />, label: "Trending" },
     {
@@ -118,6 +127,7 @@ export const LeftSideBar = () => {
             <div className="popup-sidebar w-80 h-screen bg-gray-900 border-r border-gray-800 z-50 shadow-2xl">
               {(selectedPopUp === "search") && <SearchPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
               {(selectedPopUp === "connections") && <FollowersPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
+              {(selectedPopUp === "notifications") && <NotificationsPopUp setIsCollapsed={setIsCollapsed} setShowPopup={setShowPopup}/>}
             </div>
           )}
         </div>

@@ -43,17 +43,17 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   return (
     <div className="flex gap-3 group">
       <Avatar className="w-8 h-8 flex-shrink-0">
-        <AvatarImage src={comment?.createdBy.avatarUrl || "/placeholder.svg"} />
+        <AvatarImage src={comment?.createdBy?.avatarUrl || "/placeholder.svg"} />
         <AvatarFallback className="bg-gray-700 text-white text-[10px]">
-          {comment?.createdBy.firstname?.[0]}
-          {comment?.createdBy.lastname?.[0]}
+          {(comment?.createdBy?.firstname?.[0] ?? "").toUpperCase()}
+          {(comment?.createdBy?.lastname?.[0] ?? "").toUpperCase()}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-white font-medium text-xs">
-            {comment?.createdBy.firstname?.toLowerCase()}
-            {comment?.createdBy.lastname?.toLowerCase()}
+            {(comment?.createdBy?.firstname ?? "").toLowerCase()}
+            {(comment?.createdBy?.lastname ?? "").toLowerCase()}
           </span>
           <span className="text-gray-500 text-[10px]">{formatRelative(comment?.createdAt)}</span>
         </div>

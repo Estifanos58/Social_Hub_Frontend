@@ -9,6 +9,8 @@ import { EmojiPicker } from "@ferrucc-io/emoji-picker";
 import { useMutation } from "@apollo/client/react";
 import { CREATE_COMMENT_MUTATION } from "@/graphql/mutations/comment/CreateComment";
 import { toast } from "sonner";
+import { useGeneralStore } from "@/store/generalStore";
+import { useUserStore } from "@/store/userStore";
 interface CreatedComment {
   id: string;
   content: string;
@@ -48,6 +50,8 @@ export const CommentSection = ({
   interface CreateCommentResult { createComment: CreatedComment }
   interface CreateCommentVars { postId: string; content: string; parentId?: string | null }
   const [ createComment, { loading } ] = useMutation<CreateCommentResult, CreateCommentVars>(CREATE_COMMENT_MUTATION)
+  const { setPostComment, setReplayComment } = useGeneralStore()
+  const {user} = useUserStore()
 
   // Auto-resize textarea helper
   const adjustTextareaHeight = () => {
@@ -102,16 +106,42 @@ export const CommentSection = ({
       if (!comment.trim() || isSubmitting) return;
       setIsSubmitting(true);
       try {
+        const content = comment.trim();
         const { data } = await createComment({
-          variables: { postId, content: comment.trim(), parentId: parentId || null },
+          variables: { postId, content, parentId: parentId || null },
         });
         const created = data?.createComment;
-        if (created) onCreated?.(created);
+
+        if (created) {
+          // Prefer current logged-in user from store, fall back to server response
+          const actor = user
+            ? {
+                id: user.id,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                avatarUrl: user.avatarUrl ?? "",
+              }
+            : {
+                id: created.createdBy?.id ?? "",
+                firstname: created.createdBy?.firstname ?? "",
+                lastname: created.createdBy?.lastname ?? "",
+                avatarUrl: created.createdBy?.avatarUrl ?? "",
+              };
+
+          if (parentId) {
+            setReplayComment(parentId, content, actor);
+          } else {
+            setPostComment(content, postId, actor);
+          }
+
+          onCreated?.(created);
+        }
+
         setComment("");
-          toast.success(parentId ? "Reply added" : "Comment posted");
-        } catch (error) {
+        toast.success(parentId ? "Reply added" : "Comment posted");
+      } catch (error) {
         console.error("Failed to submit comment:", error);
-          toast.error("Failed to post comment");
+        toast.error("Failed to post comment");
       } finally {
         setIsSubmitting(false);
       }
