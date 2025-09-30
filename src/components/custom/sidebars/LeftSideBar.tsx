@@ -16,12 +16,15 @@ import FollowersPopUp from "./popUps/FollowersPopUp";
 import NotificationsPopUp from "./popUps/NotificationsPopUp";
 import { useQuery } from "@apollo/client/react";
 import { GET_UNREAD_NOTIFICATIONS_COUNT } from "@/graphql/queries/notification/getUnreadNotificationsCount";
+import MessagePopUp from "./popUps/MessagePopUp";
+import { useRouter } from "next/navigation";
 
 export const LeftSideBar = () => {
   // Unread notifications count (poll every 20s)
   const { data: unreadData } = useQuery<{ unreadNotificationsCount: number }>(GET_UNREAD_NOTIFICATIONS_COUNT, {
     pollInterval: 20000,
   });
+  const router = useRouter();
   const unreadCount = unreadData?.unreadNotificationsCount ?? 0;
   const {
     isCollapsed,
@@ -54,7 +57,16 @@ export const LeftSideBar = () => {
         setSelectedPopUp("notifications");
       }
      },
-    { icon: <AiOutlineMessage />, label: "Messages" },
+    { 
+      icon: <AiOutlineMessage />,
+      label: "Messages" ,
+      href: '/message',
+      onClick: () => {
+        setShowPopup(true);
+        setIsCollapsed(true);
+        setSelectedPopUp("message")
+      }
+      },
     { icon: <IoMdTrendingUp />, label: "Trending" },
     {
       icon: <RiUserFollowLine />,
@@ -155,6 +167,7 @@ export const LeftSideBar = () => {
               {(selectedPopUp === "search") && <SearchPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
               {(selectedPopUp === "connections") && <FollowersPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
               {(selectedPopUp === "notifications") && <NotificationsPopUp setIsCollapsed={setIsCollapsed} setShowPopup={setShowPopup}/>}
+              {(selectedPopUp === "message") && <MessagePopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
             </div>
           )}
         </div>

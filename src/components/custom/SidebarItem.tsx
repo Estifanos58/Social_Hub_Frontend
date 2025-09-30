@@ -18,7 +18,7 @@ export const SidebarItem = ({ icon, label, collapsed, image, link, onClick }: Si
   const { setIsCollapsed } = useGeneralStore()
 
   const handleClick = () => {
-    setIsCollapsed(false)
+    // setIsCollapsed(false)
     if (onClick) onClick()
   }
 
