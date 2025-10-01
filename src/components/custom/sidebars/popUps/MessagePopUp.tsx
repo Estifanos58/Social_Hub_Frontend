@@ -26,9 +26,6 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
     if (loading) {
       return <MessageSkeletonList count={5} />;
     }
-    if (error) {
-      return <div className="text-red-400">Failed to load messages.</div>;
-    }
     if (!hasMessages) {
       return <div className="text-gray-500">No messages found.</div>;
     }
@@ -62,7 +59,7 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
             {renderMessages()}
             {!loading && !hasMessages && (
               <div className="text-center py-8">
-                <p className="text-gray-400">Select a chat to start messaging.</p>
+                <p className="text-gray-400">Search a User to start messaging.</p>
               </div>
             )}
           </>

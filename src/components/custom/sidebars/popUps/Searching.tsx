@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useQuery } from "@apollo/client/react";
 import { SEARCH_USERS } from "@/graphql/queries/user/searchUsers";
 import { useDebounce } from "@/hooks/useDebounce";
+import Link from "next/link";
 
 interface SearchingProps {
   defaultContent: ReactNode;
@@ -128,6 +129,7 @@ function Searching({
           {!loading && !error && users.length > 0 && (
             <div className="space-y-3">
               {users.map((user) => (
+                <Link href={`message/${user.id}`}>
                 <div
                   key={user.id}
                   className="flex items-center justify-between p-3 rounded-lg bg-gray-900/40 hover:bg-gray-900 transition-colors"
@@ -151,6 +153,7 @@ function Searching({
                     View
                   </span>
                 </div>
+                </Link>
               ))}
             </div>
           )}
