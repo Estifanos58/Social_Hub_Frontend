@@ -32,3 +32,36 @@ export interface Post {
        updatedAt: string;
     }[]
 } 
+
+
+export type MessageEdge = {
+  id: string;
+  content?: string | null;
+  imageUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  isEdited: boolean;
+  user: {
+    id: string;
+    firstname: string;
+    lastname?: string | null;
+    avatarUrl?: string | null;
+  };
+  chatroom?: {
+    id: string;
+    name?: string | null;
+    isGroup: boolean;
+    avatarUrl?: string | null;
+    memberships?: Array<{
+      userId: string;
+      user?: {
+        id: string;
+        firstname: string;
+        lastname?: string | null;
+        avatarUrl?: string | null;
+      } | null;
+    }>;
+  } | null;
+};
+
+export const DEFAULT_AVATAR = '/noAvatar.png';

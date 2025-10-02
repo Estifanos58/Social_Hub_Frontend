@@ -1,8 +1,18 @@
 import { gql } from "@apollo/client";
 
-export const GET_MESSAGES = gql`
-  query MessagesBetweenUsers($otherUserId: String!, $limit: Int, $offset: Int) {
-    messagesBetweenUsers(otherUserId: $otherUserId, limit: $limit, offset: $offset) {
+export const CREATE_MESSAGE = gql`
+  mutation CreateMessage(
+    $chatroomId: String
+    $otherUserId: String
+    $content: String
+    $imageUrl: String
+  ) {
+    createMessageMutation(
+      chatroomId: $chatroomId
+      otherUserId: $otherUserId
+      content: $content
+      imageUrl: $imageUrl
+    ) {
       id
       content
       imageUrl

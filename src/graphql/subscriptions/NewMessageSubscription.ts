@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const GET_MESSAGES = gql`
-  query MessagesBetweenUsers($otherUserId: String!, $limit: Int, $offset: Int) {
-    messagesBetweenUsers(otherUserId: $otherUserId, limit: $limit, offset: $offset) {
+export const NEW_MESSAGE_SUBSCRIPTION = gql`
+  subscription NewMessage($chatroomId: String, $otherUserId: String) {
+    newMessage(chatroomId: $chatroomId, otherUserId: $otherUserId) {
       id
       content
       imageUrl

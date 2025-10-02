@@ -8,6 +8,7 @@ import { useQuery } from "@apollo/client/react";
 import { SEARCH_USERS } from "@/graphql/queries/user/searchUsers";
 import { useDebounce } from "@/hooks/useDebounce";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface SearchingProps {
   defaultContent: ReactNode;
@@ -67,6 +68,7 @@ function Searching({
 }: SearchingProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 400);
+  const router = useRouter()
 
   const shouldSkip = useMemo(() => debouncedSearchTerm.trim().length === 0, [
     debouncedSearchTerm,
@@ -91,6 +93,10 @@ function Searching({
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
+
+  const handleMessageRoute = (userId: string) => {
+    router.replace(`/message/${userId}`)
+  }
 
   const users = data?.SearchUsers?.users ?? [];
   const isSearching = !shouldSkip;
@@ -129,8 +135,8 @@ function Searching({
           {!loading && !error && users.length > 0 && (
             <div className="space-y-3">
               {users.map((user) => (
-                <Link href={`message/${user.id}`}>
                 <div
+                 onClick={() => handleMessageRoute(user.id)}
                   key={user.id}
                   className="flex items-center justify-between p-3 rounded-lg bg-gray-900/40 hover:bg-gray-900 transition-colors"
                 >
@@ -153,7 +159,6 @@ function Searching({
                     View
                   </span>
                 </div>
-                </Link>
               ))}
             </div>
           )}

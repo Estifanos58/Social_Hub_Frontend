@@ -27,3 +27,32 @@ export const formatRelative = (iso: string): string => {
     const year = Math.floor(day / 365); // approximate
     return `${year}y`;
   };
+
+
+  export const formatTime = (value?: string | null) => {
+    if (!value) return '';
+    try {
+      const date = new Date(value);
+      return new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+      }).format(date);
+    } catch (error) {
+      return '';
+    }
+  };
+  
+  export const formatEditedTime = (createdAt: string, updatedAt: string) => {
+    if (!updatedAt || updatedAt === createdAt) return null;
+    try {
+      const updated = new Date(updatedAt);
+      const time = new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+      }).format(updated);
+      return `edited ${time}`;
+    } catch (error) {
+      return 'edited';
+    }
+  };
+  
