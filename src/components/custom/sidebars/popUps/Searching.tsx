@@ -138,7 +138,7 @@ function Searching({
                 <div
                  onClick={() => handleMessageRoute(user.id)}
                   key={user.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-gray-900/40 hover:bg-gray-900 transition-colors"
+                  className="flex pointer items-center justify-between p-3 rounded-lg bg-gray-900/40 hover:bg-gray-900 transition-colors"
                 >
                   <div className="flex items-center space-x-3">
                     <Image

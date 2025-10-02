@@ -29,6 +29,15 @@ interface MessagesBetweenUsersVariables {
   limit: number;
 }
 
+interface NewMessageSubscriptionData {
+  newMessage: MessageEdge | null;
+}
+
+interface NewMessageSubscriptionVariables {
+  chatroomId?: string | null;
+  userId?: string | null;
+}
+
 export const useMessagesBetweenUsers = ({
   otherUserId,
   limit = 50,
@@ -37,6 +46,7 @@ export const useMessagesBetweenUsers = ({
 }: UseMessagesBetweenUsersOptions) => {
   const [chatroomId, setChatroomId] = useState<string | null>(null);
   const [messages, setMessages] = useState<MessageEdge[]>([]);
+
 
   const {
     data,
@@ -84,14 +94,30 @@ export const useMessagesBetweenUsers = ({
     setChatroomId((current) => incoming.chatroom?.id ?? current ?? null);
   }, []);
 
-  useSubscription<any>(NEW_MESSAGE_SUBSCRIPTION, {
-    variables: chatroomId ? { chatroomId } : { otherUserId },
-    skip: skip || !currentUserId,
-    onData: ({ data: subscriptionData }) => {
-      const incoming = subscriptionData?.data?.newMessage as MessageEdge | undefined;
-      addMessage(incoming ?? null);
+  const subscriptionVariables = useMemo<NewMessageSubscriptionVariables | undefined>(() => {
+    if (skip) return undefined;
+    if (!chatroomId || !currentUserId) return undefined;
+
+    return {
+      chatroomId,
+      userId: currentUserId,
+    };
+  }, [chatroomId, currentUserId, skip]);
+  useSubscription<NewMessageSubscriptionData, NewMessageSubscriptionVariables>(
+    NEW_MESSAGE_SUBSCRIPTION,
+    {
+      variables: subscriptionVariables,
+      skip: !subscriptionVariables,
+      shouldResubscribe: () => true,
+      onData: ({ data: subscriptionData }) => {
+        const incoming = subscriptionData?.data?.newMessage ?? null;
+        addMessage(incoming ?? null);
+      },
+      onError: (subscriptionError) => {
+        console.error('New message subscription error:', subscriptionError);
+      },
     },
-  });
+  );
 
   const sortedMessages = useMemo(
     () =>

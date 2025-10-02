@@ -1,19 +1,26 @@
-'use client';
+"use client";
 
-import React, { useCallback, useEffect, useRef } from 'react';
-import { useMutation } from '@apollo/client/react';
-import { Smile, Image as ImageIcon, Send, X, Loader2 } from 'lucide-react';
-import { EmojiPicker } from '@ferrucc-io/emoji-picker';
+import React, { useCallback, useEffect, useRef } from "react";
+import { useMutation } from "@apollo/client/react";
+import { Smile, Image as ImageIcon, Send, X, Loader2 } from "lucide-react";
+import { EmojiPicker } from "@ferrucc-io/emoji-picker";
 
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { useUserStore } from '@/store/userStore';
-import { CREATE_MESSAGE } from '@/graphql/mutations/message/CreateMessage';
-import { ChatHeaderSkeleton, EmptyState, MessagesSkeleton } from '@/components/shared/skeleton/MessagePageSkeleton';
-import { useMessageComposer } from '@/hooks/message/useMessageComposer';
-import { useMessagesBetweenUsers } from '@/hooks/message/useMessagesBetweenUsers';
-import { ChatHeader, MessageBubble } from '@/components/custom/MessagePageCommponents';
-
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useUserStore } from "@/store/userStore";
+import { CREATE_MESSAGE } from "@/graphql/mutations/message/CreateMessage";
+import {
+  ChatHeaderSkeleton,
+  EmptyState,
+  MessagesSkeleton,
+} from "@/components/shared/skeleton/MessagePageSkeleton";
+import { useMessageComposer } from "@/hooks/message/useMessageComposer";
+import { useMessagesBetweenUsers } from "@/hooks/message/useMessagesBetweenUsers";
+import {
+  ChatHeader,
+  MessageBubble,
+} from "@/components/custom/MessagePageCommponents";
+import { useTypping } from "@/hooks/message/useTypping";
 
 interface PageProps {
   params: {
@@ -21,22 +28,24 @@ interface PageProps {
   };
 }
 
-
 export default function MessagePage({ params }: PageProps) {
   const { user } = useUserStore();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const scrollToBottom = useCallback((behavior: 'auto' | 'smooth' = 'smooth') => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
+  const scrollToBottom = useCallback(
+    (behavior: "auto" | "smooth" = "smooth") => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
 
-    requestAnimationFrame(() => {
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior,
+      requestAnimationFrame(() => {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior,
+        });
       });
-    });
-  }, []);
+    },
+    []
+  );
 
   const {
     sortedMessages,
@@ -80,11 +89,16 @@ export default function MessagePage({ params }: PageProps) {
     onMessageSent: addMessage,
   });
 
+  const { typingUsers, handleUserStartedTyping, handleUserStoppedTyping } = useTypping(
+    chatroomId,
+    user?.id ?? null
+  );
+
   const isSending = sending || isUploading;
 
   useEffect(() => {
     if (loading) return;
-    const behavior = sortedMessages.length <= 1 ? 'auto' : 'smooth';
+    const behavior = sortedMessages.length <= 1 ? "auto" : "smooth";
     scrollToBottom(behavior);
   }, [loading, scrollToBottom, sortedMessages]);
 
@@ -111,7 +125,9 @@ export default function MessagePage({ params }: PageProps) {
                 Failed to load messages. Please try again later.
               </div>
             )}
-            {!loading && !error && sortedMessages.length === 0 && <EmptyState />}
+            {!loading && !error && sortedMessages.length === 0 && (
+              <EmptyState />
+            )}
             {!loading && !error && sortedMessages.length > 0 && (
               <div className="flex flex-col gap-6">
                 {sortedMessages.map((message) => (
@@ -121,6 +137,12 @@ export default function MessagePage({ params }: PageProps) {
                     isOwn={message.user?.id === user.id}
                   />
                 ))}
+              </div>
+            )}
+            {typingUsers.length > 0 && (
+              <div className="mt-2 text-sm text-white/70">
+                {typingUsers.map((u) => u.firstname).join(", ")} {" "}
+                {typingUsers.length === 1 ? "is" : "are"} typing...
               </div>
             )}
             <div className="h-4" />
@@ -139,7 +161,7 @@ export default function MessagePage({ params }: PageProps) {
                   <div className="text-sm text-white/70">
                     {isUploading && uploadProgress !== null
                       ? `Uploading… ${uploadProgress}%`
-                      : 'Ready to send'}
+                      : "Ready to send"}
                   </div>
                 </div>
                 <Button
@@ -159,7 +181,16 @@ export default function MessagePage({ params }: PageProps) {
                   ref={textareaRef}
                   value={messageInput}
                   onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
+                  onKeyDown={(e) => {
+                    handleKeyDown(e);
+                    handleUserStartedTyping();
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      void handleUserStoppedTyping();
+                    }
+                  }}
+                  onBlur={() => {
+                    void handleUserStoppedTyping();
+                  }}
                   placeholder="Write a message…"
                   rows={1}
                   className="min-h-0 resize-none bg-white/5 text-sm text-white placeholder:text-white/40"
@@ -206,7 +237,10 @@ export default function MessagePage({ params }: PageProps) {
                             />
                           </EmojiPicker.Header>
                           <EmojiPicker.Group>
-                            <EmojiPicker.List hideStickyHeader containerHeight={240} />
+                            <EmojiPicker.List
+                              hideStickyHeader
+                              containerHeight={240}
+                            />
                           </EmojiPicker.Group>
                         </EmojiPicker>
                       </div>
@@ -216,13 +250,21 @@ export default function MessagePage({ params }: PageProps) {
               </div>
               <Button
                 type="button"
-                onClick={() => void handleSendMessage()}
+                onClick={() => {
+                  void handleSendMessage().finally(() => {
+                    void handleUserStoppedTyping();
+                  });
+                }}
                 disabled={!canSend}
                 size="icon"
                 className="h-12 w-12 rounded-full bg-emerald-500/80 text-white hover:bg-emerald-400/90 disabled:cursor-not-allowed disabled:opacity-60"
                 aria-label="Send message"
               >
-                {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                {isSending ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Send className="h-5 w-5" />
+                )}
               </Button>
             </div>
             <input
@@ -233,7 +275,9 @@ export default function MessagePage({ params }: PageProps) {
               onChange={handleFileChange}
             />
             {uploadProgress !== null && isUploading && (
-              <p className="mt-2 text-xs text-white/60">Uploading image… {uploadProgress}%</p>
+              <p className="mt-2 text-xs text-white/60">
+                Uploading image… {uploadProgress}%
+              </p>
             )}
           </div>
         </div>
