@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useCallback } from "react"
+import React from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -15,161 +15,29 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { X, Upload, ImageIcon, Plus } from "lucide-react"
 import { useGeneralStore } from "@/store/generalStore"
-import { toast } from "sonner"
-import { gql } from "@apollo/client"
-import { useMutation } from "@apollo/client/react"
-import { uploadImageToCloudinary } from "@/lib/uploadFile"
-import { CREATE_POST } from "@/graphql/mutations/post/CreatePost"
-
-interface ImageFile {
-  file: File
-  preview: string
-  id: string
-}
+import { useCreatePost } from "@/hooks/post/useCreatePost"
 
 function CreatePost() {
-  const [images, setImages] = useState<ImageFile[]>([])
-  const [content, setContent] = useState("")
-  const [isDragOver, setIsDragOver] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const { isCollapsed } = useGeneralStore()
-
-  // mutation + use its loading state
-  const [createPost, { loading }] = useMutation(CREATE_POST, {
-    onCompleted: () => {
-      toast.success("Post created successfully!")
-      setContent("")
-      setImages([])
-      setIsOpen(false)
-    },
-    onError: (err) => {
-      toast.error(err?.message || "Failed to create post.")
-    },
-  })
-
-  // minimal guard to prevent double submit during file upload phase
-  const [isUploading, setIsUploading] = useState(false)
-
-  // progress per image id
-  const [progressMap, setProgressMap] = useState<Record<string, number>>({})
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(true)
-  }, [])
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-  }, [])
-
-  const processFiles = useCallback((files: FileList) => {
-    const imageFiles = Array.from(files).filter((file) => file.type.startsWith("image/"))
-
-    imageFiles.forEach((file) => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const newImage: ImageFile = {
-          file,
-          preview: e.target?.result as string,
-          id: Math.random().toString(36).substr(2, 9),
-        }
-        setImages((prev) => [...prev, newImage])
-      }
-      reader.readAsDataURL(file)
-    })
-  }, [])
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault()
-      setIsDragOver(false)
-
-      const files = e.dataTransfer.files
-      if (files.length > 0) {
-        processFiles(files)
-      }
-    },
-    [processFiles],
-  )
-
-  const handleFileSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files
-      if (files && files.length > 0) {
-        processFiles(files)
-      }
-    },
-    [processFiles],
-  )
-
-  const removeImage = useCallback((id: string) => {
-    setImages((prev) => prev.filter((img) => img.id !== id))
-    setProgressMap((p) => {
-      const copy = { ...p }
-      delete copy[id]
-      return copy
-    })
-  }, [])
-
-  const openFileDialog = useCallback(() => {
-    fileInputRef.current?.click()
-  }, [])
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault()
-      if (!content.trim()) return
-      if (isUploading) return // guard
-
-      try {
-        // 1) Upload images if any
-        let imageUrls: string[] = []
-        if (images.length > 0) {
-          setIsUploading(true)
-          // upload each file and track progress
-          const uploadPromises = images.map((img) =>
-            uploadImageToCloudinary(img.file, (percent) => {
-              setProgressMap((prev) => ({ ...prev, [img.id]: percent }))
-            })
-          )
-
-          const results = await Promise.all(uploadPromises)
-
-          imageUrls = results
-            .filter((r) => r.success && r.url)
-            .map((r) => r.url as string)
-
-          // if any upload failed, show a toast but proceed with successful URLs
-          const failed = results.filter((r) => !r.success)
-          if (failed.length > 0) {
-            toast.error(`${failed.length} image(s) failed to upload. Proceeding with uploaded ones.`)
-          }
-        }
-
-        console.log("Image URLs:", imageUrls)
-        console.log('Content', content)
-
-        // 2) Call GraphQL mutation (mutation's loading will be used)
-        await createPost({
-          variables: { content, imageUrls },
-        })
-        // onCompleted handles success UI and reset
-      } catch (err: any) {
-        console.error(err)
-        // if createPost threw, onError already toasts, but ensure fallback:
-        if (!err?.message) {
-          toast.error("Something went wrong while creating the post.")
-        }
-      } finally {
-        setIsUploading(false)
-        // reset progress map
-        setProgressMap({})
-      }
-    },
-    [content, images, createPost, isUploading],
-  )
+  const {
+    images,
+    content,
+    setContent,
+    isDragOver,
+    isOpen,
+    setIsOpen,
+    fileInputRef,
+    loading,
+    isUploading,
+    progressMap,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    handleFileSelect,
+    removeImage,
+    openFileDialog,
+    handleSubmit,
+  } = useCreatePost()
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

@@ -1,108 +1,20 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { useMutation } from "@apollo/client/react";
 import InputField from "@/components/shared/InputField";
-import { EmailSchema, ResetPasswordSchema } from "@/validator/Auth.validator";
-import { SEND_RESET_CODE } from "@/graphql/mutations/auth/Sendresetcode";
-import { RESET_PASSWORD } from "@/graphql/mutations/auth/Resetpassword";
-import { useUserStore } from "@/store/userStore";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-
-
-
+import { useResetPassword } from "@/hooks/auth/useResetPassword";
 
 export default function ForgotPasswordPage() {
-  const [step, setStep] = useState<"email" | "reset">("email");
-  const {user , setUser } = useUserStore()
-  const [formData, setFormData] = useState<any>({
-    email: "",
-    code: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = useState<any>({});
-
-  const [sendResetCode, { loading: sending }] = useMutation(SEND_RESET_CODE);
-  const [resetPassword, { loading: resetting }] = useMutation(RESET_PASSWORD);
-  const router = useRouter();
-
-  // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
-  };
-
-  // Step 1: Submit email
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-
-    const result = EmailSchema.safeParse({ email: formData.email });
-    if (!result.success) {
-        setErrors({email: result.error.issues[0].message});
-      return;
-    }
-
-    try {
-      await sendResetCode({
-        variables: { email: formData.email },
-        onCompleted: (data: any) => {
-          if (data?.forgotPassword) {
-            toast.success("📩 Reset code sent to your email");
-            setStep("reset");
-          } else {
-            toast.error("Failed to send reset code. Try again.");
-          }
-        },
-      });
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
-    }
-  };
-
-  // Step 2: Reset password
-  const handleResetSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-
-    const result = ResetPasswordSchema.safeParse({
-      code: formData.code,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
-    });
-
-    if (!result.success) {
-      const fieldErrors: any = {};
-      result.error.issues.forEach((err) => {
-        if (err.path[0]) fieldErrors[err.path[0]] = err.message;
-      });
-      setErrors(fieldErrors);
-      return;
-    }
-
-    try {
-      await resetPassword({
-        variables: {
-          token: formData.code,
-          newPassword: formData.password,
-        },
-        onCompleted: (data:any) => {
-          if (data?.resetPassword.user) {
-            setUser(data.resetPassword.user)
-            toast.success("✅ Password reset successfully!");
-            router.push('/')
-            // redirect to login maybe
-          } else {
-            toast.error("Password reset failed. Try again.");
-          }
-        },
-      });
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
-    }
-  };
+  const {
+    step,
+    formData,
+    errors,
+    handleChange,
+    handleEmailSubmit,
+    handleResetSubmit,
+    sending,
+    resetting,
+  } = useResetPassword();
 
   return (
     <div className="flex flex-col justify-center p-8 md:p-12">

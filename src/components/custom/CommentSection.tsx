@@ -1,29 +1,12 @@
 "use client";
 
 import type React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Smile } from "lucide-react";
 import { EmojiPicker } from "@ferrucc-io/emoji-picker";
-import { useMutation } from "@apollo/client/react";
-import { CREATE_COMMENT_MUTATION } from "@/graphql/mutations/comment/CreateComment";
-import { toast } from "sonner";
-import { useGeneralStore } from "@/store/generalStore";
-import { useUserStore } from "@/store/userStore";
-interface CreatedComment {
-  id: string;
-  content: string;
-  postId: string;
-  createdAt: string;
-  parentId?: string | null;
-  createdBy?: {
-    id: string;
-    firstname?: string;
-    lastname?: string;
-    avatarUrl?: string;
-  };
-}
+import { CreatedComment, useCommentSection } from "@/hooks/comment/useCommentSection";
 
 interface CommentSectionProps {
   postId: string;
@@ -42,16 +25,19 @@ export const CommentSection = ({
   placeholder = "Write a comment...",
   compact = false,
 }: CommentSectionProps) => {
-  const [comment, setComment] = useState("");
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const emojiPickerRef = useRef<HTMLDivElement>(null);
-  interface CreateCommentResult { createComment: CreatedComment }
-  interface CreateCommentVars { postId: string; content: string; parentId?: string | null }
-  const [ createComment, { loading } ] = useMutation<CreateCommentResult, CreateCommentVars>(CREATE_COMMENT_MUTATION)
-  const { setPostComment, setReplayComment } = useGeneralStore()
-  const {user} = useUserStore()
+
+  const {
+    comment,
+    setComment,
+    showEmojiPicker,
+    setShowEmojiPicker,
+    isSubmitting,
+    emojiPickerRef,
+    handleEmojiSelect,
+    handleSubmit,
+    handleKeyDown,
+  } = useCommentSection({ postId, parentId, onCreated });
 
   // Auto-resize textarea helper
   const adjustTextareaHeight = () => {
@@ -62,96 +48,6 @@ export const CommentSection = ({
     const max = 220;
     const newHeight = Math.min(el.scrollHeight, max);
     el.style.height = newHeight + "px";
-  };
-
-  // Close emoji picker when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        emojiPickerRef.current &&
-        !emojiPickerRef.current.contains(event.target as Node)
-      ) {
-        setShowEmojiPicker(false);
-      }
-    };
-
-    if (showEmojiPicker) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showEmojiPicker]);
-
-  const handleEmojiSelect = (emoji: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const newComment = comment.slice(0, start) + emoji + comment.slice(end);
-
-    setComment(newComment);
-    setShowEmojiPicker(false);
-
-    // Focus back to textarea and set cursor position after emoji
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + emoji.length, start + emoji.length);
-    }, 0);
-  };
-
-    const handleSubmit = async () => {
-      if (!comment.trim() || isSubmitting) return;
-      setIsSubmitting(true);
-      try {
-        const content = comment.trim();
-        const { data } = await createComment({
-          variables: { postId, content, parentId: parentId || null },
-        });
-        const created = data?.createComment;
-
-        if (created) {
-          // Prefer current logged-in user from store, fall back to server response
-          const actor = user
-            ? {
-                id: user.id,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                avatarUrl: user.avatarUrl ?? "",
-              }
-            : {
-                id: created.createdBy?.id ?? "",
-                firstname: created.createdBy?.firstname ?? "",
-                lastname: created.createdBy?.lastname ?? "",
-                avatarUrl: created.createdBy?.avatarUrl ?? "",
-              };
-
-          if (parentId) {
-            setReplayComment(parentId, content, actor);
-          } else {
-            setPostComment(content, postId, actor);
-          }
-
-          onCreated?.(created);
-        }
-
-        setComment("");
-        toast.success(parentId ? "Reply added" : "Comment posted");
-      } catch (error) {
-        console.error("Failed to submit comment:", error);
-        toast.error("Failed to post comment");
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-      e.preventDefault();
-      handleSubmit();
-    }
   };
 
   return (

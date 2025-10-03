@@ -30,5 +30,5 @@ export default function ProtectedRoute({
     return <p>Loading...</p>;
   }
 
-  return <>{children}</>;
+  setTimeout(()=>{ return <>{children}</>;},1000)
 }

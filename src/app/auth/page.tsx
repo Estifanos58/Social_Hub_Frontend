@@ -1,119 +1,22 @@
 "use client";
-import React, { useState } from "react";
-import { useMutation } from "@apollo/client/react";
-import { REGISTER_USER } from "@/graphql/mutations/auth/Register";
-import { LOGIN_USER } from "@/graphql/mutations/auth/LoginUser";
-import { SignUp, Login } from "@/validator/Auth.validator";
-import { z } from "zod";
-import { LoginMutation, RegisterMutation } from "@/gql/graphql";
-import { useUserStore } from "@/store/userStore";
+import React from "react";
 import LoginForm from "@/components/custom/LoginForm";
 import SignUpForm from "@/components/custom/SignUpForm";
 import GoogleOAuth from "@/components/shared/GoogleOAuth";
-import { useRouter } from "next/navigation";
 import GitHubOAuth from "@/components/shared/GitHubOAuth";
-import { toast } from "sonner";
-
-const initialState = {
-  firstname: "",
-  lastname: "",
-  email: "",
-  password: "",
-  terms: false,
-};
-
-const initialErrorState = {
-  firstname: "",
-  lastname: "",
-  email: "",
-  password: "",
-  terms: "",
-};
+import { useAuthForm } from "@/hooks/auth/useAuthForm";
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(false);
-  const [formData, setFormData] = useState(initialState);
-  const [errors, setErrors] = useState(initialErrorState);
-  const navigate = useRouter();
-  const { setUser } = useUserStore();
-
-  const [registerUser, { loading: registerLoading }] =
-    useMutation<RegisterMutation>(REGISTER_USER);
-  const [loginUser, { loading: loginLoading }] =
-    useMutation<LoginMutation>(LOGIN_USER);
-
-  // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  // Validate form on submit
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors(initialErrorState);
-
-    try {
-      let validatedData;
-
-      if (!isLogin) {
-        validatedData = SignUp.parse(formData);
-
-        await registerUser({
-          variables: {
-            firstname: validatedData.firstname,
-            lastname: validatedData.lastname,
-            email: validatedData.email,
-            password: validatedData.password,
-          },
-          onCompleted: (data: any) => {
-            if (data?.register.user) {
-              setUser(data.register.user);
-              navigate.push("/auth/verify");
-              toast.success("Registration successful!");
-            }
-          },
-        }).catch((err) => {
-          console.log(err.graphQLErrors, "ERROR");
-          toast.error(err.message || "Registration failed");
-        });
-      } else {
-        validatedData = Login.parse(formData);
-
-        await loginUser({
-          variables: {
-            email: validatedData.email,
-            password: validatedData.password,
-          },
-          onCompleted: (data: any) => {
-            if (data?.login.user) {
-              setUser(data.login.user);
-              toast.success("Login successful!");
-              navigate.push("/");
-            }
-          },
-        }).catch((err) => {
-          console.log(err.graphQLErrors, "ERROR");
-          toast.error(err.message || "Login failed");
-        });
-      }
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const fieldErrors: any = {};
-        err.issues.forEach((e) => {
-          if (e.path[0]) {
-            fieldErrors[e.path[0]] = e.message;
-          }
-        });
-        setErrors((prev) => ({ ...prev, ...fieldErrors }));
-      }
-    }
-  };
-
-  const loading = isLogin ? loginLoading : registerLoading;
+  const {
+    isLogin,
+    setIsLogin,
+    formData,
+    setFormData,
+    errors,
+    handleChange,
+    handleSubmit,
+    loading,
+  } = useAuthForm();
 
   return (
     <div className="flex flex-col justify-center p-8 md:p-12">
