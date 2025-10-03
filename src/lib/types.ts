@@ -64,4 +64,29 @@ export type MessageEdge = {
   } | null;
 };
 
+export interface ChatroomLastMessage {
+  id: string;
+  content?: string | null;
+  imageUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  isEdited: boolean;
+  user?: {
+    id: string;
+    firstname: string;
+    lastname?: string | null;
+    avatarUrl?: string | null;
+  } | null;
+}
+
+export interface ChatroomListItem {
+  id: string;
+  isGroup: boolean;
+  name: string;
+  avatarUrl: string;
+  routeId: string;
+  lastMessage: ChatroomLastMessage | null;
+  lastActivityAt: string;
+}
+
 export const DEFAULT_AVATAR = '/noAvatar.png';
