@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef } from "react";
+import { use, useCallback, useEffect, useRef } from "react";
 import { useMutation } from "@apollo/client/react";
 import { Smile, Image as ImageIcon, Send, X, Loader2 } from "lucide-react";
 import { EmojiPicker } from "@ferrucc-io/emoji-picker";
@@ -23,12 +23,14 @@ import {
 import { useTypping } from "@/hooks/message/useTypping";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function MessagePage({ params }: PageProps) {
+  const resolvedParams = use(params);
+  const { id } = resolvedParams;
   const { user } = useUserStore();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -55,7 +57,7 @@ export default function MessagePage({ params }: PageProps) {
     error,
     chatroomMeta,
   } = useMessagesBetweenUsers({
-    otherUserId: params.id,
+    otherUserId: id,
     limit: 50,
     currentUserId: user?.id ?? null,
     skip: !user,
@@ -83,7 +85,7 @@ export default function MessagePage({ params }: PageProps) {
     openFilePicker,
   } = useMessageComposer({
     chatroomId,
-    otherUserId: params.id,
+    otherUserId: id,
     isSending: sending,
     sendMessage,
     onMessageSent: addMessage,
