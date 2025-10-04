@@ -1,11 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
 import Image from "next/image";
-import { useQuery } from "@apollo/client/react";
-import { GET_FOLLOWERS } from "@/graphql/queries/user/getFollowers";
-import { GET_FOLLOWING } from "@/graphql/queries/user/getFollowing";
-import { GetFollowersQuery, GetFollowingQuery } from "@/gql/graphql";
+import { useFollowersPopup } from "../../../../hooks/user/useFollowersPopup";
 
 interface FollowersPopUpProps {
   setShowPopup: (value: boolean) => void;
@@ -13,66 +9,22 @@ interface FollowersPopUpProps {
 }
 
 function FollowersPopUp({ setShowPopup, setIsCollapsed }: FollowersPopUpProps) {
-  const [activeTab, setActiveTab] = useState<"followers" | "following">("followers");
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Followers Query
   const {
-    data: followersData,
-    loading: followersLoading,
-    fetchMore: fetchMoreFollowers,
-  } = useQuery<GetFollowersQuery>(GET_FOLLOWERS, {
-    variables: { take: 10, skip: 0 },
-    notifyOnNetworkStatusChange: true,
-  });
-
-  // Following Query
-  const {
-    data: followingData,
-    loading: followingLoading,
-    fetchMore: fetchMoreFollowing,
-  } = useQuery<GetFollowingQuery>(GET_FOLLOWING, {
-    variables: { take: 10, skip: 0 },
-    notifyOnNetworkStatusChange: true,
-  });
-
-  // Current list & counts
-  const currentList =
-    activeTab === "followers"
-      ? followersData?.GetFollowers?.users ?? []
-      : followingData?.GetFollowing?.users ?? [];
-
-const totalFollowers =
-  activeTab === "followers"
-    ? followersData?.GetFollowers?.totalFollowers ?? 0
-    : followingData?.GetFollowing?.totalFollowers ?? 0;
-
-const totalFollowing =
-  activeTab === "followers"
-    ? followersData?.GetFollowers?.totalFollowing ?? 0
-    : followingData?.GetFollowing?.totalFollowing ?? 0;
-
-
-  const loading = activeTab === "followers" ? followersLoading : followingLoading;
-
-  // Load more on scroll
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-
-    if (scrollTop + clientHeight >= scrollHeight - 5) {
-      if (activeTab === "followers" && followersData?.GetFollowers?.hasMore) {
-        fetchMoreFollowers({
-          variables: { skip: currentList.length, take: 10 },
-        });
-      }
-      if (activeTab === "following" && followingData?.GetFollowing?.hasMore) {
-        fetchMoreFollowing({
-          variables: { skip: currentList.length, take: 10 },
-        });
-      }
-    }
-  };
+    activeTab,
+    setActiveTab,
+    currentList,
+    totalFollowers,
+    totalFollowing,
+    loading,
+    scrollRef,
+    pendingUnfollowUser,
+    unfollowError,
+    unfollowLoading,
+    handleScroll,
+    handleOpenUnfollowModal,
+    handleConfirmUnfollow,
+    handleCloseUnfollowModal,
+  } = useFollowersPopup();
 
   return (
     <div className="p-6 h-full flex flex-col">
@@ -158,7 +110,10 @@ const totalFollowing =
                   <p className="text-gray-400 text-sm">{user.email}</p>
                 </div>
               </div>
-              <button className="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-700 text-white hover:bg-gray-600 transition-colors">
+              <button
+                onClick={() => handleOpenUnfollowModal(user)}
+                className="px-4 ml-5 py-1.5 rounded-full text-sm font-medium bg-gray-700 text-white hover:bg-gray-600 transition-colors"
+              >
                 Following
               </button>
             </div>
@@ -175,6 +130,40 @@ const totalFollowing =
           </div>
         )}
       </div>
+
+      {pendingUnfollowUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-sm rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-white">
+              Unfollow {pendingUnfollowUser.firstname}?
+            </h3>
+            <p className="mt-2 text-sm text-gray-300">
+              If you unfollow this user, their posts will no longer appear in your feed.
+            </p>
+            {unfollowError && (
+              <p className="mt-3 rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                {unfollowError}
+              </p>
+            )}
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={handleCloseUnfollowModal}
+                className="rounded-full px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800"
+                disabled={unfollowLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmUnfollow}
+                className="rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-70"
+                disabled={unfollowLoading}
+              >
+                {unfollowLoading ? "Unfollowing..." : "Yes, unfollow"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
