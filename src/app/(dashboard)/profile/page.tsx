@@ -1,9 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
 import {
   Heart,
   MessageCircle,
@@ -11,32 +9,21 @@ import {
   Lock,
   Globe,
   Grid3X3,
-  Bookmark,
-  UserCheck,
 } from "lucide-react"
-import { useQuery } from "@apollo/client/react"
-import { GET_USER_PROFILE } from "@/graphql/queries/user/getUserProfile"
-import { useUserStore } from "@/store/userStore"
-import { GetUserProfileQuery } from "@/gql/graphql"
 import Link from "next/link"
+import { useProfilePage } from "../../../hooks/user/useProfilePage"
 
 export default function ProfilePage() {
-  const { user: currentUser } = useUserStore()
-  const { data, loading, error } = useQuery<GetUserProfileQuery>(
-    GET_USER_PROFILE,
-    {
-      variables: { userId: currentUser?.id },
-      fetchPolicy: "cache-and-network",
-    }
-  )
-
-  const profile = data?.GetUser
-  const account = profile?.user
-
-  const [hoveredPost, setHoveredPost] = useState<string | null>(null)
-  const [isPrivate, setIsPrivate] = useState<boolean>(
-    account?.isPrivate ?? false
-  )
+  const {
+    loading,
+    error,
+    profile,
+    account,
+    hoveredPost,
+    setHoveredPost,
+    isPrivate,
+    handleSelectPost,
+  } = useProfilePage()
 
   // 🔄 Loading
   if (loading) {
@@ -159,6 +146,7 @@ export default function ProfilePage() {
           {profile.posts?.map((post: any) => (
             <div
               key={post.id}
+              onClick={() => handleSelectPost(post)}
               className="relative aspect-square group cursor-pointer overflow-hidden"
               onMouseEnter={() => setHoveredPost(post.id)}
               onMouseLeave={() => setHoveredPost(null)}

@@ -3,21 +3,17 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MoreHorizontal, X } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { SelectedPost } from "@/store/generalStore";
 import { CommentSection } from "./CommentSection";
-import { formatRelative } from "@/lib/utils";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { ReactionBar } from "../shared/ReactionBar";
-import { usePostComments } from "@/hooks/usePostComments";
-import React, { useState } from "react";
+import React from "react";
 import { CommentSkeletonList } from "../shared/skeleton/CommentSkeleton";
-import { CommentItem, CommentNode } from "./CommentItem";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { useGeneralStore } from "@/store/generalStore";
+import { CommentItem } from "./CommentItem";
+import { usePostDetailModal, sliderSettings } from "../../hooks/post/usePostDetailModal";
 
 interface PostDetailModalProps {
   isOpen: boolean;
@@ -30,50 +26,24 @@ export function PostDetailModal({
   onClose,
   post,
 }: PostDetailModalProps) {
-  const { setSelectedPost } = useGeneralStore();
-
-  const sliderSettings = {
-    dots: true,
-    infinite: false,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-  };
-
   const {
-    comments: liveComments,
-    loading: commentsLoading,
-    loadMore,
+    resolvedPost,
+    images,
+    reactionSummary,
+    createdAtLabel,
+    isDetailsLoading,
+    commentsWithLocalReplies,
     hasNextPage,
-    totalCount,
-  } = usePostComments({ postId: post?.id });
+    loadMore,
+    handleReplyAdded,
+    postId,
+    showCommentsSkeleton,
+    commentsLoading
+  } = usePostDetailModal(post);
 
-  // Merge server-fetched comments with any preloaded ones (avoid duplicates by id)
-  const initialComments = post?.comments || [];
-  const mergedCommentsMap = new Map<string, any>();
-  [...initialComments, ...liveComments].forEach(c => {
-    if (!mergedCommentsMap.has(c.id)) mergedCommentsMap.set(c.id, c);
-  });
-  const mergedComments = Array.from(mergedCommentsMap.values()) as CommentNode[];
+  const createdBy = resolvedPost?.createdBy;
 
-  // Local state for newly added replies (not yet part of query results) keyed by parentId
-  const [localReplies, setLocalReplies] = useState<Record<string, CommentNode[]>>({});
-
-  const handleReplyAdded = (parentId: string, reply: CommentNode) => {
-    setLocalReplies(prev => ({
-      ...prev,
-      [parentId]: prev[parentId] ? [...prev[parentId], reply] : [reply],
-    }));
-    toast.success("Reply added");
-  };
-
-  // Merge local replies into comment structure (shallow, for display only)
-  const commentsWithLocalReplies: CommentNode[] = mergedComments.map(c => {
-    const extra = localReplies[c.id] || [];
-    if (!extra.length) return c;
-    return { ...c, replies: [...(c.replies || []), ...extra] };
-  });
+  const postContent = resolvedPost?.content ?? "";
 
   return (
     <Dialog
@@ -84,14 +54,19 @@ export function PostDetailModal({
         }
       }}
     >
-  <DialogContent className="lg:max-w-5xl w-full h-[85vh] p-0 bg-gray-900 text-gray-100 border border-gray-800 flex flex-col data-[state=open]:animate-none">
+      <DialogContent className="lg:max-w-5xl w-full h-[85vh] p-0 bg-gray-900 text-gray-100 border border-gray-800 flex flex-col data-[state=open]:animate-none">
         <div className="flex h-full">
           {/* Left side - Image */}
           <div className="flex-1 bg-gray-900 flex items-center justify-center overflow-hidden relative border-r border-gray-800">
-            {post?.images.length > 0 ? (
+            {isDetailsLoading && images.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-3 text-gray-500 text-sm">
+                <div className="h-12 w-12 animate-spin rounded-full border-2 border-gray-700 border-t-transparent" />
+                <span>Loading post...</span>
+              </div>
+            ) : images.length > 0 ? (
               <Slider {...sliderSettings} className="w-[400px] h-full">
-                {post.images.map((img: any) => (
-                  <div key={img.id} className="w-full h-full flex items-center justify-center px-6 py-4 bg-gray-900">
+                {images.map((img: any) => (
+                  <div key={img.id ?? `image-${img.url}`} className="w-full h-full flex items-center justify-center px-6 py-4 bg-gray-900">
                     <img
                       src={img.url}
                       alt="post image"
@@ -112,16 +87,16 @@ export function PostDetailModal({
               <div className="flex items-center gap-3">
                 <Avatar className="w-8 h-8">
                   <AvatarImage
-                    src={post?.createdBy.avatarUrl || "/placeholder.svg"}
+                    src={createdBy?.avatarUrl || "/placeholder.svg"}
                   />
                   <AvatarFallback className="bg-gray-800 text-white">
-                    {post?.createdBy.firstname[0]}
-                    {post?.createdBy.lastname[0]}
+                    {createdBy?.firstname?.[0]}
+                    {createdBy?.lastname?.[0]}
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-white font-semibold text-sm">
-                  {post?.createdBy.firstname.toLowerCase()}
-                  {post?.createdBy.lastname.toLowerCase()}
+                  {createdBy?.firstname?.toLowerCase?.() ?? ""}
+                  {createdBy?.lastname?.toLowerCase?.() ?? ""}
                 </span>
               </div>
               <Button
@@ -138,27 +113,27 @@ export function PostDetailModal({
               {/* Original post content card */}
               <div className="flex gap-3 pb-4 border-b border-gray-800">
                 <Avatar className="w-9 h-9 flex-shrink-0">
-                  <AvatarImage src={post?.createdBy.avatarUrl || "/placeholder.svg"} />
+                  <AvatarImage src={createdBy?.avatarUrl || "/placeholder.svg"} />
                   <AvatarFallback className="bg-gray-700 text-white text-xs">
-                    {post?.createdBy.firstname[0]}
-                    {post?.createdBy.lastname[0]}
+                    {createdBy?.firstname?.[0]}
+                    {createdBy?.lastname?.[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-white font-semibold text-sm truncate">
-                      {post?.createdBy.firstname.toLowerCase()}{post?.createdBy.lastname.toLowerCase()}
+                      {createdBy?.firstname?.toLowerCase?.() ?? ""}{createdBy?.lastname?.toLowerCase?.() ?? ""}
                     </span>
-                    <span className="text-gray-500 text-xs">• {formatRelative(post?.createdAt)}</span>
+                    <span className="text-gray-500 text-xs">• {createdAtLabel}</span>
                   </div>
                   <p className="text-sm text-gray-200 mt-1 whitespace-pre-wrap leading-relaxed">
-                    {post?.content}
+                    {postContent || ""}
                   </p>
                 </div>
               </div>
 
               {/* Comments dynamic */}
-              {commentsLoading && mergedComments.length === 0 && (
+              {showCommentsSkeleton && (
                 <CommentSkeletonList count={5} />
               )}
 
@@ -168,7 +143,7 @@ export function PostDetailModal({
                     <CommentItem
                       key={comment.id}
                       comment={comment}
-                      postId={post.id}
+                      postId={postId!}
                       onReplyAdded={handleReplyAdded}
                     />
                   ))}
@@ -197,17 +172,17 @@ export function PostDetailModal({
             <div className="border-t border-gray-800 p-4 space-y-4 bg-gray-900">
               <ReactionBar
                 post={{
-                  id: post?.id,
-                  reactionsCount: (post as any)?.reactionsCount ?? 0,
-                  userReaction: (post as any)?.userReaction ?? null,
-                  commentsCount: (post as any)?.comments?.length ?? 0,
+                  id: postId!,
+                  reactionsCount: reactionSummary.reactionsCount,
+                  userReaction: reactionSummary.userReaction,
+                  commentsCount: reactionSummary.commentsCount,
                 }}
                 showCommentButton={false}
               />
               <div className="text-gray-400 text-xs">
-                {formatRelative(post?.createdAt)}
+                {createdAtLabel}
               </div>
-              <CommentSection postId={post?.id} />
+              <CommentSection postId={postId!} />
             </div>
           </div>
         </div>

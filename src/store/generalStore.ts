@@ -3,19 +3,19 @@ import { create } from "zustand";
 
 export interface SelectedPost {
     id: string;
-    content: string;
-    createdAt: string;
-    createdBy: {
+    content?: string;
+    createdAt?: string;
+    createdBy?: {
         id: string;
         firstname: string;
         lastname: string;
         avatarUrl: string;
-    },
-    images: {
+    } | null;
+    images?: {
         id: string;
         url: string;
-    }[],
-    comments: {
+    }[];
+    comments?: {
         id: string;
         content: string;
         createdAt: string;
@@ -24,10 +24,10 @@ export interface SelectedPost {
             firstname: string;
             lastname: string;
             avatarUrl: string;
-        },
+        };
         parentId: string | null;    
        updatedAt: string;
-    }[]
+    }[];
 
 }
 
@@ -77,6 +77,9 @@ export const useGeneralStore = create<GeneralState>((set) => ({
     setPostComment: (content, postId, user) => set((state) => {
         if (!state.selectedPost || state.selectedPost.id !== postId) return {} as any;
         const now = new Date().toISOString();
+        const existingComments = Array.isArray(state.selectedPost.comments)
+            ? state.selectedPost.comments
+            : [];
         const newComment = {
             id: `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             content,
@@ -88,15 +91,18 @@ export const useGeneralStore = create<GeneralState>((set) => ({
         return {
             selectedPost: {
                 ...state.selectedPost,
-                comments: [newComment, ...(state.selectedPost.comments || [])],
+                comments: [newComment, ...existingComments],
             },
         };
     }),
 
     setReplayComment: (parentId, content, user) => set((state) => {
         if (!state.selectedPost) return {} as any;
+        const existingComments = Array.isArray(state.selectedPost.comments)
+            ? state.selectedPost.comments
+            : [];
         // Optionally ensure parent exists in the current comments list
-        const parentExists = state.selectedPost.comments?.some((c) => c.id === parentId);
+        const parentExists = existingComments.some((c) => c.id === parentId);
         if (!parentExists) return {} as any;
         const now = new Date().toISOString();
         const newReply = {
@@ -110,7 +116,7 @@ export const useGeneralStore = create<GeneralState>((set) => ({
         return {
             selectedPost: {
                 ...state.selectedPost,
-                comments: [newReply, ...(state.selectedPost.comments || [])],
+                comments: [newReply, ...existingComments],
             },
         };
     }),
