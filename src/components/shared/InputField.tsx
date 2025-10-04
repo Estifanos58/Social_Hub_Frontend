@@ -33,7 +33,9 @@ export default function InputField({
 
   return (
     <div className="flex flex-col space-y-2">
-      <Label htmlFor={name}>{label}</Label>
+      <Label htmlFor={name} className="text-gray-200">
+        {label}
+      </Label>
       <div className="relative">
         <Input
           id={name}
@@ -42,13 +44,13 @@ export default function InputField({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
-          className="rounded-4xl p-3 h-10 pr-10" // 👈 extra padding for icon
+          className={`rounded-4xl h-10 p-3 ${isPasswordField && togglePassword ? "pr-10" : ""} bg-gray-800 border border-gray-700 text-gray-100 placeholder:text-gray-400 focus-visible:ring-blue-500 focus-visible:ring-2 focus-visible:border-blue-500 focus-visible:ring-offset-0`}
         />
         {isPasswordField && togglePassword && (
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>

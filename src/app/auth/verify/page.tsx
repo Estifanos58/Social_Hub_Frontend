@@ -16,9 +16,9 @@ export default function VerifyPage() {
   } = useVerifyEmailForm();
 
   return (
-    <div className="flex flex-col justify-center p-8 md:p-12">
-      <h2 className="text-4xl font-semibold mb-2">Verification Code</h2>
-      <p className="text-sm text-gray-500 mb-6">
+    <div className="flex flex-col justify-center bg-gray-900 p-8 md:p-12 text-gray-100">
+      <h2 className="text-4xl font-semibold mb-2 text-white">Verification Code</h2>
+      <p className="text-sm text-gray-400 mb-6">
         We sent you a verification code to your email.
       </p>
 
@@ -36,7 +36,7 @@ export default function VerifyPage() {
               onChange={(e) => handleChange(e.target.value, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               onPaste={handlePaste}
-              className="w-24 h-12 text-center text-xl border border-gray-300 rounded-4xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-24 h-12 text-center text-xl border border-gray-700 rounded-4xl bg-gray-900 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           ))}
         </div>
@@ -46,11 +46,11 @@ export default function VerifyPage() {
         </Button>
       </form>
 
-      <div className="mt-6 text-sm text-gray-500 text-center">
+      <div className="mt-6 text-sm text-gray-400 text-center">
         Didn’t get a code?{" "}
         <button
           type="button"
-          className="text-blue-600 hover:underline"
+          className="text-blue-400 hover:underline"
           onClick={() => toast.info("📩 Resend code feature coming soon")}
         >
           Resend

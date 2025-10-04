@@ -22,7 +22,7 @@ export default function SignUpForm({
   loading,
 }: SignUpFormProps) {
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-4 text-gray-100" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputField
           name="firstname"
@@ -77,9 +77,9 @@ export default function SignUpForm({
             }))
           }
         />
-        <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
+        <label htmlFor="terms" className="text-sm text-gray-300 cursor-pointer">
           I agree to the{" "}
-          <a href="#" className="text-blue-600 hover:underline">
+          <a href="#" className="text-blue-400 hover:underline">
             Terms & Conditions
           </a>
         </label>

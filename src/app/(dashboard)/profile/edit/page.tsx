@@ -82,18 +82,18 @@ export default function ProfileUpdatePage() {
   };
 
   return (
-    <div className="dark min-h-screen flex-1 overflow-y-scroll bg-background">
+    <div className="min-h-screen flex-1 overflow-y-scroll bg-gray-900 text-gray-100">
       <div className="container max-w-4xl mx-auto py-8 px-4">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" className="h-10 w-10">
+          {/* <Button variant="ghost" size="icon" className="h-10 w-10 text-gray-200 hover:text-white">
             <ArrowLeft className="h-5 w-5" />
-          </Button>
+          </Button> */}
           <div>
-            <h1 className="text-3xl font-bold text-foreground">
+            <h1 className="text-3xl font-bold text-gray-100">
               Profile Settings
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-gray-400">
               Manage your account settings and preferences
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function ProfileUpdatePage() {
 
         <div className="grid gap-8">
           {/* Profile Image Section */}
-          <Card className="bg-card text-card-foreground">
+          <Card className="bg-gray-900 border border-gray-800 text-gray-100">
             <CardHeader>
               <CardTitle>Profile Picture</CardTitle>
               <CardDescription>
@@ -112,7 +112,7 @@ export default function ProfileUpdatePage() {
           </Card>
 
           {/* Personal Information */}
-          <Card className="bg-card text-card-foreground">
+          <Card className="bg-gray-900 border border-gray-800 text-gray-100">
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
               <CardDescription>
@@ -151,15 +151,15 @@ export default function ProfileUpdatePage() {
               />
 
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
+                <Label htmlFor="bio" className="text-gray-200">Bio</Label>
                 <Textarea
                   id="bio"
                   value={formData.bio}
                   onChange={(e) => handleInputChange("bio", e.target.value)}
                   placeholder="Tell us about yourself..."
-                  className="min-h-[100px] resize-none"
+                  className="min-h-[100px] resize-none bg-gray-800 border border-gray-700 text-gray-100 placeholder:text-gray-400"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-gray-400">
                   {formData.bio.length}/500 characters
                 </p>
               </div>
@@ -167,7 +167,7 @@ export default function ProfileUpdatePage() {
           </Card>
 
           {/* Privacy & Security */}
-          <Card className="bg-card text-card-foreground">
+          <Card className="bg-gray-900 border border-gray-800 text-gray-100">
             <CardHeader>
               <CardTitle>Privacy & Security</CardTitle>
               <CardDescription>
@@ -179,7 +179,7 @@ export default function ProfileUpdatePage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="profile-status">Profile Status</Label>
+                    <Label htmlFor="profile-status" className="text-gray-200">Profile Status</Label>
                     <Badge
                       variant={formData.isPrivate ? "secondary" : "default"}
                     >
@@ -196,7 +196,7 @@ export default function ProfileUpdatePage() {
                       )}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-400">
                     {formData.isPrivate
                       ? "Your profile is only visible to you"
                       : "Your profile is visible to everyone"}
@@ -217,19 +217,20 @@ export default function ProfileUpdatePage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="two-factor">
+                    <Label htmlFor="two-factor" className="text-gray-200">
                       Two-Factor Authentication
                     </Label>
                     <Badge
                       variant={
                         formData.twoFactorEnabled ? "default" : "outline"
                       }
+                      className="text-white"
                     >
                       <Shield className="h-3 w-3 mr-1" />
                       {formData.twoFactorEnabled ? "Enabled" : "Disabled"}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-400">
                     Add an extra layer of security to your account
                   </p>
                 </div>
@@ -246,13 +247,13 @@ export default function ProfileUpdatePage() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-end">
-            <Button variant="outline" className="sm:w-auto text-white">
+            <Button variant="outline" className="sm:w-auto text-black border border-gray-700">
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={loading}
-              className="sm:w-auto"
+              className="sm:w-auto bg-gray-100 text-gray-900 hover:bg-gray-200"
             >
               <Save className="h-4 w-4 mr-2" />
               {loading ? "Saving..." : "Save Changes"}

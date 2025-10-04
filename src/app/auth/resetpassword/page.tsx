@@ -17,11 +17,11 @@ export default function ForgotPasswordPage() {
   } = useResetPassword();
 
   return (
-    <div className="flex flex-col justify-center p-8 md:p-12">
+    <div className="flex flex-col justify-center bg-gray-900 p-8 md:p-12 text-gray-100">
       {step === "email" ? (
         <>
-          <h2 className="text-3xl font-semibold mb-2">Forgot Password</h2>
-          <p className="text-sm text-gray-500 mb-6">
+          <h2 className="text-3xl font-semibold mb-2 text-white">Forgot Password</h2>
+          <p className="text-sm text-gray-400 mb-6">
             Enter your email address and we’ll send you a 6-digit code.
           </p>
           <form onSubmit={handleEmailSubmit} className="space-y-4">
@@ -40,8 +40,8 @@ export default function ForgotPasswordPage() {
         </>
       ) : (
         <>
-          <h2 className="text-3xl font-semibold mb-2">Reset Password</h2>
-          <p className="text-sm text-gray-500 mb-6">
+          <h2 className="text-3xl font-semibold mb-2 text-white">Reset Password</h2>
+          <p className="text-sm text-gray-400 mb-6">
             Enter the 6-digit code sent to <b>{formData.email}</b> and set your
             new password.
           </p>

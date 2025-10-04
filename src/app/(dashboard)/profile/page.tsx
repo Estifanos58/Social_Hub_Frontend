@@ -41,7 +41,7 @@ export default function ProfilePage() {
   // 🔄 Loading
   if (loading) {
     return (
-      <div className="min-h-screen flex-1 bg-black flex items-center justify-center text-white">
+      <div className="min-h-screen flex-1 bg-gray-900 flex items-center justify-center text-gray-100">
         <p className="animate-pulse text-gray-400">Loading profile...</p>
       </div>
     )
@@ -50,7 +50,7 @@ export default function ProfilePage() {
   // ❌ Error
   if (error) {
     return (
-      <div className="min-h-screen flex-1 bg-black flex items-center justify-center text-red-500">
+      <div className="min-h-screen flex-1 bg-gray-900 flex items-center justify-center text-red-400">
         <p>Failed to load profile: {error.message}</p>
       </div>
     )
@@ -59,14 +59,14 @@ export default function ProfilePage() {
   // 📝 No user
   if (!profile || !account) {
     return (
-      <div className="min-h-screen flex-1 bg-black flex items-center justify-center text-gray-400">
+      <div className="min-h-screen flex-1 bg-gray-900 flex items-center justify-center text-gray-400">
         <p>No user profile found.</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-black flex-1 overflow-y-scroll text-white">
+    <div className="min-h-screen bg-gray-900 flex-1 overflow-y-scroll text-gray-100">
       <div className="max-w-4xl mx-auto p-4">
         {/* Header */}
         <div className="flex items-start gap-8 mb-8">
@@ -87,11 +87,11 @@ export default function ProfilePage() {
           {/* Info */}
           <div className="flex-1 space-y-4">
             <div className="flex items-center gap-4 flex-wrap">
-              <h1 className="text-xl font-light">{account.email}</h1>
+              <h1 className="text-xl font-light text-gray-100">{account.email}</h1>
               <Link href={"/profile/edit"}>
               <Button
                 variant="secondary"
-                className="bg-gray-800 hover:bg-gray-700 text-white border-gray-600"
+                className="bg-gray-800 hover:bg-gray-700 text-gray-100 border border-gray-700"
               >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit profile
@@ -100,7 +100,7 @@ export default function ProfilePage() {
               
               <Button
                 variant="secondary"
-                className="bg-gray-800 hover:bg-gray-700 text-white border-gray-600"
+                className="bg-gray-800 hover:bg-gray-700 text-gray-100 border border-gray-700"
               >
                 View archive
               </Button>

@@ -22,7 +22,7 @@ export default function LoginForm({
   const navigate = useRouter();
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-4 text-gray-100" onSubmit={handleSubmit}>
       <InputField
         name="email"
         label="Email Address"
@@ -49,7 +49,7 @@ export default function LoginForm({
         <button
           type="button"
           onClick={() => navigate.push("/auth/resetpassword")}
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-blue-400 hover:underline"
         >
           Forgot password?
         </button>

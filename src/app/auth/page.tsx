@@ -19,18 +19,18 @@ export default function AuthPage() {
   } = useAuthForm();
 
   return (
-    <div className="flex flex-col justify-center p-8 md:p-12">
-      <h2 className="text-3xl font-semibold mb-2">
+    <div className="flex flex-col justify-center bg-gray-900 p-8 md:p-12 text-gray-100">
+      <h2 className="text-3xl font-semibold mb-2 text-white">
         {isLogin ? "Login to Your Account" : "Create an Account"}
       </h2>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-gray-400 mb-6">
         {isLogin ? (
           <>
             Don't have an account?{" "}
             <button
               type="button"
               onClick={() => setIsLogin(false)}
-              className="text-blue-600 hover:underline"
+              className="text-blue-400 hover:underline"
             >
               Sign Up
             </button>
@@ -41,7 +41,7 @@ export default function AuthPage() {
             <button
               type="button"
               onClick={() => setIsLogin(true)}
-              className="text-blue-600 hover:underline"
+              className="text-blue-400 hover:underline"
             >
               Log in
             </button>

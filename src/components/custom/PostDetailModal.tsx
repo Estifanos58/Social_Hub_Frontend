@@ -84,14 +84,14 @@ export function PostDetailModal({
         }
       }}
     >
-  <DialogContent className="lg:max-w-5xl w-full h-[85vh] p-0 bg-black border-gray-800 flex flex-col data-[state=open]:animate-none">
+  <DialogContent className="lg:max-w-5xl w-full h-[85vh] p-0 bg-gray-900 text-gray-100 border border-gray-800 flex flex-col data-[state=open]:animate-none">
         <div className="flex h-full">
           {/* Left side - Image */}
-          <div className="flex-1 bg-black flex items-center justify-center overflow-hidden relative border-r border-gray-800">
+          <div className="flex-1 bg-gray-900 flex items-center justify-center overflow-hidden relative border-r border-gray-800">
             {post?.images.length > 0 ? (
               <Slider {...sliderSettings} className="w-[400px] h-full">
                 {post.images.map((img: any) => (
-                  <div key={img.id} className="w-full h-full flex items-center justify-center px-6 py-4 bg-black">
+                  <div key={img.id} className="w-full h-full flex items-center justify-center px-6 py-4 bg-gray-900">
                     <img
                       src={img.url}
                       alt="post image"
@@ -101,12 +101,12 @@ export function PostDetailModal({
                 ))}
               </Slider>
             ) : (
-              <div className="text-gray-600 text-sm">No images</div>
+              <div className="text-gray-500 text-sm">No images</div>
             )}
           </div>
 
           {/* Right side - Post details */}
-          <div className="w-96 bg-black border-l border-gray-800 flex flex-col">
+          <div className="w-96 bg-gray-900 border-l border-gray-800 flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-800">
               <div className="flex items-center gap-3">
@@ -114,7 +114,7 @@ export function PostDetailModal({
                   <AvatarImage
                     src={post?.createdBy.avatarUrl || "/placeholder.svg"}
                   />
-                  <AvatarFallback className="bg-gray-700 text-white">
+                  <AvatarFallback className="bg-gray-800 text-white">
                     {post?.createdBy.firstname[0]}
                     {post?.createdBy.lastname[0]}
                   </AvatarFallback>
@@ -185,7 +185,7 @@ export function PostDetailModal({
                     variant="ghost"
                     size="sm"
                     onClick={() => loadMore()}
-                    className="w-full text-xs bg-gray-800/40 hover:bg-gray-800"
+                    className="w-full text-xs bg-gray-900/70 hover:bg-gray-800"
                   >
                     Load more comments
                   </Button>
@@ -194,7 +194,7 @@ export function PostDetailModal({
             </div>
 
             {/* Reactions + Comments input */}
-            <div className="border-t border-gray-800 p-4 space-y-4 bg-gradient-to-b from-black to-gray-950">
+            <div className="border-t border-gray-800 p-4 space-y-4 bg-gray-900">
               <ReactionBar
                 post={{
                   id: post?.id,
@@ -212,19 +212,6 @@ export function PostDetailModal({
           </div>
         </div>
 
-        {/* Close button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="absolute top-4 right-4 text-white hover:bg-gray-800 z-10"
-          onClick={() => {
-            onClose();
-            setSelectedPost(null);
-          }}
-          aria-label="Close"
-        >
-          <X className="w-6 h-6" />
-        </Button>
       </DialogContent>
     </Dialog>
   );

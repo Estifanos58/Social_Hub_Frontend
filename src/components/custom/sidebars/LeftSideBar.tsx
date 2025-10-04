@@ -130,7 +130,7 @@ export const LeftSideBar = () => {
 
   return (
     <>
-      <div className="bg-gray-900 border-r border-gray-800 transition-all duration-300 flex flex-col position-fixed h-screen top-0">
+  <div className="bg-gray-900 text-gray-100 border-r border-gray-800 transition-all duration-300 flex flex-col position-fixed h-screen top-0">
         {/* Logo */}
         <div className="flex">
           <div>
@@ -163,7 +163,7 @@ export const LeftSideBar = () => {
           </div>
 
           {showPopup && (
-            <div className="popup-sidebar w-80 h-screen bg-gray-900 border-r border-gray-800 z-50 shadow-2xl">
+            <div className="popup-sidebar w-80 h-screen bg-gray-900 text-gray-100 border-r border-gray-800 z-50 shadow-2xl">
               {(selectedPopUp === "search") && <SearchPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
               {(selectedPopUp === "connections") && <FollowersPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed}/>}
               {(selectedPopUp === "notifications") && <NotificationsPopUp setIsCollapsed={setIsCollapsed} setShowPopup={setShowPopup}/>}

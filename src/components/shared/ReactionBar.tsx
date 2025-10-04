@@ -148,7 +148,7 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
   };
 
   return (
-    <div className={`flex items-center space-x-6 text-gray-400 text-sm relative ${className}`}>
+  <div className={`flex items-center space-x-6 text-gray-300 text-sm relative ${className}`}>
       <div
         className="relative"
         onMouseEnter={openReactions}
@@ -171,7 +171,7 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
         </button>
         {showReactions && (
           <div
-            className="absolute z-10 bottom-full left-0 mb-2 flex bg-gray-700 rounded-lg shadow-lg p-2 space-x-2"
+            className="absolute z-10 bottom-full left-0 mb-2 flex bg-gray-900 border border-gray-700 rounded-lg shadow-2xl p-2 space-x-2 backdrop-blur"
             onMouseEnter={openReactions}
             onMouseLeave={scheduleCloseReactions}
           >
@@ -181,7 +181,7 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
                 <button
                   key={reaction.name}
                   className={`text-2xl p-2 rounded-full transition-transform duration-150 ${reaction.color} ` +
-                    (isSelected ? "ring-2 ring-white scale-110" : "hover:bg-gray-600 hover:scale-110")}
+                    (isSelected ? "ring-2 ring-amber-400 scale-110 bg-gray-900" : "hover:bg-gray-800 hover:scale-110 bg-gray-900/20")}
                   onClick={() => {
                     if (isPersisting || disabled) return;
                     setSelectedReaction(prev => {
@@ -219,7 +219,7 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
       {showCommentButton && (
         <button
           onClick={onCommentClick}
-          className="hover:text-green-400 flex items-center gap-2 text-2xl"
+          className="hover:text-emerald-400 flex items-center gap-2 text-2xl transition-colors"
           aria-label="Open comments"
           disabled={disabled}
           type="button"

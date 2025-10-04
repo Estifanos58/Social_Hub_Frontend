@@ -53,9 +53,9 @@ export const CommentSection = ({
   return (
     <div className={
       (compact
-        ? "mt-2 rounded-lg border border-gray-800/60 bg-gray-900/70 p-3"
-        : "mt-4 rounded-xl border border-gray-800/80 bg-gradient-to-b from-gray-900/80 to-gray-900/40 p-4") +
-      " text-gray-200 shadow-inner shadow-black/40 transition-colors"
+        ? "mt-2 rounded-lg border border-gray-800 bg-gray-900 p-3"
+        : "mt-4 rounded-xl border border-gray-800 bg-gray-900 p-4") +
+      " text-gray-200 shadow-inner shadow-black/30 transition-colors"
     }>
       <div className="relative">
         <div className="flex items-center gap-3">
@@ -70,7 +70,7 @@ export const CommentSection = ({
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               autoFocus={autoFocus}
-              className={(compact ? "min-h-[40px] text-sm" : "min-h-[48px] text-2xl") + " max-h-[140px] leading-relaxed resize-none pr-12 bg-gray-800/70 border border-gray-700/70 hover:border-gray-600 focus:border-amber-400/70 focus:ring-2 focus:ring-amber-400/30 placeholder:text-gray-500 rounded-lg shadow-sm focus:shadow-md transition-all duration-200 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-700/70 hover:scrollbar-thumb-gray-600"}
+              className={(compact ? "min-h-[40px] text-sm" : "min-h-[48px] text-2xl") + " max-h-[140px] leading-relaxed resize-none pr-12 bg-gray-900 border border-gray-700 hover:border-gray-500 focus:border-amber-400/70 focus:ring-2 focus:ring-amber-400/30 placeholder:text-gray-500 rounded-lg shadow-sm focus:shadow-md transition-all duration-200 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-700 hover:scrollbar-thumb-gray-600"}
               rows={2}
               style={{ overflowY: "auto" }}
             />
@@ -90,14 +90,14 @@ export const CommentSection = ({
                 </Button>
                 {showEmojiPicker && (
                   <div
-                    className="absolute bottom-full right-0 mb-2 z-50 w-80 origin-bottom-right rounded-xl border border-gray-700/70 bg-gray-900/95 shadow-xl ring-1 ring-black/50 backdrop-blur-md p-2 animate-[fadeIn_120ms_ease-out]"
+                    className="absolute bottom-full right-0 mb-2 z-50 w-80 origin-bottom-right rounded-xl border border-gray-700 bg-gray-900 shadow-xl ring-1 ring-black/50 backdrop-blur-md p-2 animate-[fadeIn_120ms_ease-out]"
                     data-theme="dark"
                     role="dialog"
                     aria-label="Emoji picker"
                   >
                     <div className="max-h-80 overflow-y-auto pr-1 custom-scrollbar scrollbar-thin scrollbar-thumb-gray-700/70 scrollbar-track-transparent">
                       <EmojiPicker
-                        className="border border-gray-700/60 bg-gray-950/60 dark:border-zinc-800 rounded-lg"
+                        className="border border-gray-700 bg-gray-900 dark:border-zinc-800 rounded-lg"
                         emojisPerRow={12}
                         emojiSize={28}
                         onEmojiSelect={handleEmojiSelect}
@@ -106,7 +106,7 @@ export const CommentSection = ({
                           <EmojiPicker.Input
                             placeholder="Search emoji"
                             autoFocus={true}
-                            className="rounded-md bg-gray-800/70 placeholder:text-gray-500 text-sm focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 border border-gray-700/70 w-full px-2 py-1 transition"
+                            className="rounded-md bg-gray-900 placeholder:text-gray-500 text-sm focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 border border-gray-700 w-full px-2 py-1 transition"
                           />
                         </EmojiPicker.Header>
                         <EmojiPicker.Group>
@@ -126,14 +126,14 @@ export const CommentSection = ({
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className={(compact ? "bg-gray-800 h-9 px-3 text-xs" : "bg-gray-900 h-full") + " hover:bg-gray-800 text-white shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all"}
+              className={(compact ? "bg-gray-900 h-9 px-3 text-xs" : "bg-gray-900 h-full px-5 text-sm") + " hover:bg-gray-800 text-white shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all border border-gray-700"}
             >
               {isSubmitting ? "Posting..." : "Post"}
             </Button>
           )}
         </div>
         {comment.trim() && !compact && (
-          <div className="text-xs text-gray-500 mt-2 pl-0.5 select-none">
+          <div className="text-xs text-gray-400 mt-2 pl-0.5 select-none">
             Press Cmd+Enter (Mac) or Ctrl+Enter (Windows) to post
           </div>
         )}

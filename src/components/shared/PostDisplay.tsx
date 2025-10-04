@@ -62,21 +62,21 @@ export const PostDisplay = ({ post }: { post: Post }) => {
   const {setSelectedPost} = useGeneralStore();
 
   return (
-    <div className="m-6 w-[550px] bg-gray-800 rounded-xl p-4 shadow-lg">
+    <div className="m-6 w-[600px] bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl text-gray-100">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <img
             src={post.createdBy.avatarUrl}
             alt="avatar"
-            className="w-10 h-10 rounded-full"
+            className="w-10 h-10 rounded-full border border-gray-700"
           />
           <div>
-            <p className="font-semibold text-sm">{post.createdBy.firstname}</p>
+            <p className="font-semibold text-sm text-white">{post.createdBy.firstname}</p>
           </div>
         </div>
         <span
-          className="text-xs text-gray-500"
+          className="text-xs text-gray-400"
           title={post.updatedAt ? `Edited at ${post.updatedAt}` : post.createdAt}
         >
           {post.updatedAt
@@ -86,18 +86,18 @@ export const PostDisplay = ({ post }: { post: Post }) => {
       </div>
 
       {/* Content */}
-      <p className="mb-3 text-sm">{post.content}</p>
+      <p className="mb-4 text-sm text-gray-200">{post.content}</p>
 
       {/* Images */}
       {post.images.length > 0 && (
-        <div className="mb-3 relative group">
+        <div className="mb-4 relative group">
           <Slider {...sliderSettings}>
             {post.images.map((img: any) => (
               <div key={img.id} className="px-1">
                 <img
                   src={img.url}
                   alt="post"
-                  className="w-full h-[350px] object-cover rounded-lg"
+                  className="w-full h-[350px] object-cover rounded-lg border border-gray-800"
                 />
               </div>
             ))}
@@ -110,11 +110,11 @@ export const PostDisplay = ({ post }: { post: Post }) => {
         post={post}
         onCommentClick={() => setSelectedPost(post)}
         showCommentButton
-        className="mb-3"
+        className="mb-4"
       />
-        <div>
-          <CommentSection postId={post.id} />
-        </div>
+      <div className="bg-gray-900">
+        <CommentSection postId={post.id} />
+      </div>
     </div>
   );
 };
