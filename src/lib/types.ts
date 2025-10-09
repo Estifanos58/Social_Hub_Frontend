@@ -52,6 +52,7 @@ export type MessageEdge = {
     name?: string | null;
     isGroup: boolean;
     avatarUrl?: string | null;
+    updatedAt?: string | null;
     memberships?: Array<{
       userId: string;
       user?: {

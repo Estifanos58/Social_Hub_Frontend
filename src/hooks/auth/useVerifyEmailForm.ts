@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
+import { useRouter } from 'next/navigation';
 
 import { VERIFY_EMAIL } from "@/graphql/mutations/auth/VerifyEmail";
 import { VerifyEmailMutation } from "@/gql/graphql";
@@ -18,6 +19,7 @@ interface UseVerifyEmailFormReturn {
 export const useVerifyEmailForm = (): UseVerifyEmailFormReturn => {
   const [codes, setCodes] = useState<string[]>(["", "", "", ""]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const router = useRouter()
 
   const [verifyEmail, { loading }] = useMutation<VerifyEmailMutation>(VERIFY_EMAIL);
 
@@ -65,7 +67,8 @@ export const useVerifyEmailForm = (): UseVerifyEmailFormReturn => {
         },
         onCompleted: (data) => {
           if (data?.verifyEmail) {
-            toast.success("✅ Email verified successfully!");
+            toast.success("Email verified successfully!");
+            router.push('/')
           } else {
             toast.error("Verification failed. Try again.");
           }

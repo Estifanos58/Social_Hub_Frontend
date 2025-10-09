@@ -86,6 +86,7 @@ export default function MessagePage({ params }: PageProps) {
   } = useMessageComposer({
     chatroomId,
     otherUserId: id,
+    currentUserId: user?.id ?? null,
     isSending: sending,
     sendMessage,
     onMessageSent: addMessage,

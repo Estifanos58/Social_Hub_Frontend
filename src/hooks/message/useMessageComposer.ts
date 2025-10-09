@@ -3,6 +3,8 @@ import type { ChangeEvent, KeyboardEvent, RefObject } from 'react';
 import type { MessageEdge } from '@/lib/types';
 import { useCloudinaryImageUpload } from '@/hooks/useCloudinaryImageUpload';
 import { toast } from 'sonner';
+import { userMessageStore } from '@/store/messageStore';
+import { buildChatroomListItemFromMessageEdge } from './chatroomList.helpers';
 
 interface CreateMessageVariables {
   chatroomId?: string | null;
@@ -16,6 +18,7 @@ type SendMessageFunction = (options?: { variables?: CreateMessageVariables }) =>
 interface UseMessageComposerOptions {
   chatroomId: string | null;
   otherUserId: string;
+  currentUserId?: string | null;
   isSending: boolean;
   sendMessage: SendMessageFunction;
   onMessageSent: (message: MessageEdge) => void;
@@ -46,6 +49,7 @@ interface UseMessageComposerResult {
 export const useMessageComposer = ({
   chatroomId,
   otherUserId,
+  currentUserId,
   isSending,
   sendMessage,
   onMessageSent,
@@ -64,6 +68,11 @@ export const useMessageComposer = ({
     fileInputRef,
     openFilePicker,
   } = useCloudinaryImageUpload();
+
+  // Cache the selector to avoid infinite loop
+  const upsertChatroom = userMessageStore(
+    useMemo(() => (state) => state.upsertChatroom, [])
+  );
 
   const [messageInput, setMessageInput] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -118,6 +127,19 @@ export const useMessageComposer = ({
       const newMessage = response.data?.createMessageMutation as MessageEdge | undefined;
       if (newMessage) {
         onMessageSent(newMessage);
+
+        if (currentUserId) {
+          const listItem = buildChatroomListItemFromMessageEdge(newMessage, currentUserId);
+          if (listItem) {
+            const exists = userMessageStore
+              .getState()
+              .chatrooms.some((room) => room.id === listItem.id);
+
+            if (!exists) {
+              upsertChatroom(listItem);
+            }
+          }
+        }
       }
 
       resetInputState();
@@ -130,11 +152,13 @@ export const useMessageComposer = ({
     notifyError,
     onMessageSent,
     otherUserId,
+    currentUserId,
     resetInputState,
     selectedImage,
     sendMessage,
     trimmedMessage,
     uploadSelectedImage,
+    upsertChatroom,
   ]);
 
   const handleEmojiSelect = useCallback(
