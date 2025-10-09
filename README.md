@@ -1,36 +1,153 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SocialHub Frontend
+
+## Overview
+
+SocialHub Frontend is the Next.js application that powers the client experience of the SocialHub social networking platform. It delivers a responsive, real-time interface built with the App Router, Apollo Client, GraphQL subscriptions, and a modern TailwindCSS design system. The frontend integrates tightly with the NestJS backend to support authentication, social feeds, messaging, and notifications.
+
+---
+
+## Key Features
+
+- **Authentication & Routing**
+	- Protected routes powered by a server-side `ProtectedRoute` component.
+	- OAuth and email/password flows (login, register, reset, verify).
+	- Zustand store (`useUserStore`) keeps the current user session.
+
+- **Social Feed & Interactions**
+	- Infinite, cursor-based post feed (`GET_POSTS`) with skeleton loading states.
+	- Rich post composer with drag & drop uploads, Cloudinary integration, and progress tracking.
+	- Dynamic reaction bar, nested comments, and emoji picker overlays.
+	- Optimistic updates for in-memory comments (`useGeneralStore`).
+
+- **Messaging**
+	- Real-time chat experience using GraphQL subscriptions over WebSockets.
+	- Group chatrooms, typing indicators, and conversation lists (see `src/hooks/message/*`).
+
+- **Notifications & Suggestions**
+	- Aggregated notification center with unread counts.
+	- Suggested users to follow, powered by GraphQL queries.
+
+- **Design System**
+	- TailwindCSS v4 with custom components under `src/components/ui` and `src/components/custom`.
+	- Radix UI primitives for accessible dialogs, popovers, avatars, and more.
+	- Dark theme with `next-themes` and custom theming helpers.
+
+- **Developer Experience**
+	- GraphQL Code Generator to produce typed documents in `src/gql`.
+	- Modular folder structure with domain-specific hooks, stores, and components.
+	- Turbopack for faster local dev and builds.
+
+---
+
+## Architecture
+
+- **Next.js 15 App Router** for server/client component composition.
+- **Apollo Client** configured in `apolloClient.ts`, with split links for HTTP queries/mutations and WebSocket subscriptions.
+- **GraphQL Operations** stored in `src/graphql` and compiled to typed hooks in `src/gql` via `graphql-codegen`.
+- **State Management** using Zustand stores (`src/store/*`) and custom hooks for domain logic.
+- **UI Layer** built from reusable components in `src/components/*`.
+- **Utilities** for formatting, uploads, validation, and shared types in `src/lib` and `src/validator`.
+
+---
+
+## Project Structure
+
+```
+socialhub_frontend/
+├─ apolloClient.ts          # Apollo client configuration
+├─ codegen.ts               # GraphQL codegen configuration
+├─ src/
+│  ├─ app/                  # App Router layouts & pages (auth, dashboard, messaging)
+│  ├─ components/           # UI primitives & feature components
+│  ├─ gql/                  # Generated GraphQL artifacts
+│  ├─ graphql/              # Queries, mutations, subscriptions
+│  ├─ hooks/                # Domain hooks (auth, post, comment, message, user)
+│  ├─ lib/                  # Shared utilities (upload, formatting, types)
+│  ├─ store/                # Zustand stores
+│  └─ validator/            # Zod schemas for forms
+├─ public/                  # Static assets
+└─ .codacy/                 # Codacy CLI configuration
+```
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- Backend server running (see `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` environment variables)
+- Cloudinary account (for post image uploads)
+
+### Installation
+
+```bash
+npm install
+```
+
+### Environment Variables
+
+Create `.env.local` (or `.env`) at the project root:
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:5000/graphql
+NEXT_PUBLIC_WS_URL=ws://localhost:5000/graphql
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=<preset>
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=<cloud-name>
+NEXT_PUBLIC_CLOUDINARY_API_KEY=<api-key>
+```
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+### GraphQL Codegen
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run codegen
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Testing & Linting
 
-## Deploy on Vercel
+```bash
+npm run lint
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+You can also rely on Codacy CLI (configured in `.codacy/`) for additional static analysis.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Deployment
+
+- Deploy on Vercel or any Next-compatible host.
+- Ensure environment variables are configured in the deployment platform.
+- For SSR caching and performance, consider enabling Vercel Edge or self-host with Node.js 18+.
+
+---
+
+## Contributing
+
+1. Fork and clone the repository.
+2. Create a feature branch.
+3. Commit changes and open a pull request.
+
+Please ensure your PR includes updated snapshots (if applicable) and documentation.
+
+---
+
+## License
+
+SocialHub Frontend is released under the MIT License.

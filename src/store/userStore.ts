@@ -10,6 +10,7 @@ interface User {
     bio?: string;
     verified?: boolean;
     isPrivate?: boolean;
+  isFollowing?: boolean;
     createdAt: string;
     updatedAt: string;
 

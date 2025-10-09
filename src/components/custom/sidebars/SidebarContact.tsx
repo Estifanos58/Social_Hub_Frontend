@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 function SidebarContact({
   user,
 }: {
-  user: { id: string; firstname: string; avatarUrl?: string };
+  user: { id: string; firstname: string; avatarUrl?: string; isFollowing?: boolean };
 }) {
   const [followUser, { loading, error }] = useMutation(FOLLOW_USER);
   const { removeUserFromToFollow } = useUserStore()
@@ -48,7 +48,7 @@ function SidebarContact({
         className="bg-transparent hover:bg-gray-800 text-blue-400 text-xs px-3 py-1 rounded-md"
         onClick={()=> handleFollow(user.id)}
       >
-        { loading ? "loading.." : "Follow"}
+        {loading ? "Loading..." : user.isFollowing ? "Follow back" : "Follow"}
       </Button>
     </div>
   );
