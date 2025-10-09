@@ -114,13 +114,15 @@ export default function MessagePage({ params }: PageProps) {
   }
 
   return (
-    <div className="flex flex-1 min-h-screen flex-col bg-gradient-to-br from-zinc-950 via-black to-zinc-900 px-4 py-6 sm:px-8">
-      <div className="flex overflow-y-scroll h-[calc(100vh-3rem)] w-full flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/70 text-white shadow-2xl backdrop-blur">
-        {loading ? <ChatHeaderSkeleton /> : <ChatHeader {...chatroomMeta} />}
-        <div className="flex flex-1 flex-col">
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-gray-900 text-white">
+      <div className="flex flex-1 flex-col overflow-hidden border border-white/10 bg-gray-900 shadow-2xl">
+        <div className="sticky top-0 z-20 border-b border-white/10 bg-gray-900/95 backdrop-blur">
+          {loading ? <ChatHeaderSkeleton /> : <ChatHeader {...chatroomMeta} />}
+        </div>
+        <div ref={scrollContainerRef} className="flex flex-1  scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 overflow-y-scroll  flex-col">
           <div
-            ref={scrollContainerRef}
-            className="flex-1  overflow-y-scroll px-6 py-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10"
+            
+            className="flex-1 px-6 py-8 "
           >
             {loading && <MessagesSkeleton />}
             {!loading && error && (
@@ -143,14 +145,14 @@ export default function MessagePage({ params }: PageProps) {
               </div>
             )}
             {typingUsers.length > 0 && (
-              <div className="mt-2 text-sm text-white/70">
+              <div className="mt-2 text-sm text-white">
                 {typingUsers.map((u) => u.firstname).join(", ")} {" "}
                 {typingUsers.length === 1 ? "is" : "are"} typing...
               </div>
             )}
             <div className="h-4" />
           </div>
-          <div className="border-t border-white/10 bg-black/40 px-4 py-4 sm:px-6">
+          <div className="sticky bottom-0 z-20 border-t border-white/10 bg-gray-900/95 px-4 py-4 backdrop-blur sm:px-6">
             {selectedImage && (
               <div className="mb-3 flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 p-3">
                 <div className="flex items-center gap-3">
@@ -178,8 +180,8 @@ export default function MessagePage({ params }: PageProps) {
                 </Button>
               </div>
             )}
-            <div className="flex items-end gap-3">
-              <div className="relative flex-1">
+            <div className="flex items-center gap-3">
+              <div className="relative flex items-center flex-1">
                 <Textarea
                   ref={textareaRef}
                   value={messageInput}
@@ -198,12 +200,12 @@ export default function MessagePage({ params }: PageProps) {
                   rows={1}
                   className="min-h-0 resize-none bg-white/5 text-sm text-white placeholder:text-white/40"
                 />
-                <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+                <div className="right-2 flex items-center gap-1.5">
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="text-white/70 hover:text-white"
+                    className="text-white/70"
                     onClick={openFilePicker}
                     disabled={isSending}
                     aria-label="Attach image"
@@ -215,7 +217,7 @@ export default function MessagePage({ params }: PageProps) {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="text-white/70 hover:text-white"
+                      className="text-white/70"
                       onClick={toggleEmojiPicker}
                       aria-label="Add emoji"
                       aria-expanded={showEmojiPicker}

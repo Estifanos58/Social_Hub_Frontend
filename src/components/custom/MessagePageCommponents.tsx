@@ -18,7 +18,7 @@ export const MessageBubble = ({ message, isOwn }: { message: MessageEdge; isOwn:
       })}
     >
       <div className="flex items-baseline justify-between gap-4">
-        <p className="text-sm font-semibold text-foreground">
+        <p className="text-sm font-semibold text-white">
           {message.user?.firstname ?? 'Unknown'}
         </p>
         <span className="text-xs text-white/60">{formatTime(message.createdAt)}</span>
