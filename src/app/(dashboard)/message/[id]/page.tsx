@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useCallback, useEffect, useRef } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { Smile, Image as ImageIcon, Send, X, Loader2 } from "lucide-react";
 import { EmojiPicker } from "@ferrucc-io/emoji-picker";
@@ -16,11 +16,10 @@ import {
 } from "@/components/shared/skeleton/MessagePageSkeleton";
 import { useMessageComposer } from "@/hooks/message/useMessageComposer";
 import { useMessagesBetweenUsers } from "@/hooks/message/useMessagesBetweenUsers";
-import {
-  ChatHeader,
-  MessageBubble,
-} from "@/components/custom/MessagePageCommponents";
+import { ChatHeader, MessageBubble } from "@/components/custom/MessagePageCommponents";
 import { useTypping } from "@/hooks/message/useTypping";
+import { ChatroomDetailModal } from "@/components/modal/ChatroomDetailModal";
+import { userMessageStore } from "@/store/messageStore";
 
 interface PageProps {
   params: Promise<{
@@ -33,6 +32,9 @@ export default function MessagePage({ params }: PageProps) {
   const { id } = resolvedParams;
   const { user } = useUserStore();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isDetailOpen, setDetailOpen] = useState(false);
+  const selectedChatroomMeta = userMessageStore((state) => state.selectedChatroomMeta);
+  const setSelectedChatroomMeta = userMessageStore((state) => state.setSelectedChatroomMeta);
 
   const scrollToBottom = useCallback(
     (behavior: "auto" | "smooth" = "smooth") => {
@@ -100,6 +102,14 @@ export default function MessagePage({ params }: PageProps) {
   const isSending = sending || isUploading;
 
   useEffect(() => {
+    if (chatroomMeta?.id) {
+      setSelectedChatroomMeta(chatroomMeta);
+    }
+  }, [chatroomMeta, setSelectedChatroomMeta]);
+
+  const activeChatroomMeta = chatroomMeta?.id ? chatroomMeta : selectedChatroomMeta ?? chatroomMeta;
+
+  useEffect(() => {
     if (loading) return;
     const behavior = sortedMessages.length <= 1 ? "auto" : "smooth";
     scrollToBottom(behavior);
@@ -117,7 +127,15 @@ export default function MessagePage({ params }: PageProps) {
     <div className="flex h-screen w-full flex-col overflow-hidden bg-gray-900 text-white">
       <div className="flex flex-1 flex-col overflow-hidden border border-white/10 bg-gray-900 shadow-2xl">
         <div className="sticky top-0 z-20 border-b border-white/10 bg-gray-900/95 backdrop-blur">
-          {loading ? <ChatHeaderSkeleton /> : <ChatHeader {...chatroomMeta} />}
+          {loading ? (
+            <ChatHeaderSkeleton />
+          ) : (
+            <ChatHeader
+              {...activeChatroomMeta}
+              onShowDetail={chatroomId ? () => setDetailOpen(true) : undefined}
+              disableDetailButton={!chatroomId}
+            />
+          )}
         </div>
         <div ref={scrollContainerRef} className="flex flex-1  scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 overflow-y-scroll  flex-col">
           <div
@@ -287,6 +305,12 @@ export default function MessagePage({ params }: PageProps) {
           </div>
         </div>
       </div>
+      <ChatroomDetailModal
+        open={isDetailOpen}
+        onOpenChange={setDetailOpen}
+        chatroomId={chatroomId}
+        meta={activeChatroomMeta}
+      />
     </div>
   );
 }

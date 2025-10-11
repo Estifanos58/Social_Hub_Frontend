@@ -11,6 +11,7 @@ import Searching, { MessageSkeletonList } from "./Searching";
 import { useUserChatrooms } from "@/hooks/message/useUserChatrooms";
 import { userMessageStore } from "@/store/messageStore";
 import { formatRelative } from "@/lib/utils";
+import { ChatroomMeta, ChatroomListItem, DEFAULT_AVATAR } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { CreateGroupModal } from "../../../modal/CreateGroupModal";
 
@@ -25,16 +26,35 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
   const router = useRouter();
   const { chatrooms, isInitialLoading, error, refetch } = useUserChatrooms();
   const setSelectedChatRoomId = userMessageStore((state) => state.setSelectedChatRoomId);
+  const setSelectedChatroomMeta = userMessageStore((state) => state.setSelectedChatroomMeta);
   const [isCreateGroupOpen, setCreateGroupOpen] = useState(false);
 
+  const toChatroomMeta = useCallback(
+    (room: ChatroomListItem | undefined): ChatroomMeta | null => {
+      if (!room) return null;
+      return {
+        id: room.id,
+        isGroup: room.isGroup,
+        name: room.name,
+        avatarUrl: room.avatarUrl ?? DEFAULT_AVATAR,
+        subtitle: room.isGroup ? "Group chat" : "Direct message",
+      };
+    },
+    [],
+  );
+
   const handleOpenChatroom = useCallback(
-    (chatroomId: string, routeId: string) => {
+    (chatroomId: string, routeId: string, meta?: ChatroomMeta | null) => {
       setSelectedChatRoomId(chatroomId);
+      const resolvedMeta = meta ?? toChatroomMeta(chatrooms.find((room) => room.id === chatroomId));
+      if (resolvedMeta) {
+        setSelectedChatroomMeta(resolvedMeta);
+      }
       setShowPopup(true);
       setIsCollapsed(true);
       router.push(`/message/${routeId}`);
     },
-    [router, setIsCollapsed, setSelectedChatRoomId, setShowPopup],
+    [chatrooms, router, setIsCollapsed, setSelectedChatRoomId, setSelectedChatroomMeta, setShowPopup, toChatroomMeta],
   );
 
   const handleGroupCreated = useCallback(
@@ -113,12 +133,13 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
                 const timestamp = lastMessage?.createdAt
                   ? formatRelative(lastMessage.createdAt)
                   : "";
+                const chatroomMeta = toChatroomMeta(chatroom);
 
                 return (
                   <button
                     key={chatroom.id}
                     type="button"
-                    onClick={() => handleOpenChatroom(chatroom.id, chatroom.routeId)}
+                    onClick={() => handleOpenChatroom(chatroom.id, chatroom.routeId, chatroomMeta)}
                     className="flex w-full items-center justify-between rounded-lg bg-gray-900/40 p-3 text-left transition hover:bg-gray-900"
                   >
                     <div className="flex items-center gap-3">

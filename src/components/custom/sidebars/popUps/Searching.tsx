@@ -7,8 +7,9 @@ import Image from "next/image";
 import { useQuery } from "@apollo/client/react";
 import { SEARCH_USERS } from "@/graphql/queries/user/searchUsers";
 import { useDebounce } from "@/hooks/useDebounce";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { userMessageStore } from "@/store/messageStore";
+import { DEFAULT_AVATAR } from "@/lib/types";
 
 interface SearchingProps {
   defaultContent: ReactNode;
@@ -69,6 +70,8 @@ function Searching({
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 400);
   const router = useRouter()
+  const setSelectedChatRoomId = userMessageStore((state) => state.setSelectedChatRoomId);
+  const setSelectedChatroomMeta = userMessageStore((state) => state.setSelectedChatroomMeta);
 
   const shouldSkip = useMemo(() => debouncedSearchTerm.trim().length === 0, [
     debouncedSearchTerm,
@@ -94,8 +97,16 @@ function Searching({
     setSearchTerm(event.target.value);
   };
 
-  const handleMessageRoute = (userId: string) => {
-    router.replace(`/message/${userId}`)
+  const handleMessageRoute = (user: SearchUsersQueryData['SearchUsers']['users'][number]) => {
+    setSelectedChatRoomId(null);
+    setSelectedChatroomMeta({
+      id: null,
+      isGroup: false,
+      name: user.firstname,
+      avatarUrl: user.avatarUrl ?? DEFAULT_AVATAR,
+      subtitle: user.email,
+    });
+    router.replace(`/message/${user.id}`)
   }
 
   const users = data?.SearchUsers?.users ?? [];
@@ -136,7 +147,7 @@ function Searching({
             <div className="space-y-3">
               {users.map((user) => (
                 <div
-                 onClick={() => handleMessageRoute(user.id)}
+                 onClick={() => handleMessageRoute(user)}
                   key={user.id}
                   className="flex pointer items-center justify-between p-3 rounded-lg bg-gray-900/40 hover:bg-gray-900 transition-colors"
                 >

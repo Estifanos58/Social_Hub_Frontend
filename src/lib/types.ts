@@ -91,3 +91,43 @@ export interface ChatroomListItem {
 }
 
 export const DEFAULT_AVATAR = '/noAvatar.png';
+
+export interface ChatroomMeta {
+  id: string | null;
+  isGroup: boolean;
+  name: string;
+  avatarUrl?: string | null;
+  subtitle?: string | null;
+}
+
+export interface ChatroomMemberDetail {
+  id: string;
+  userId: string;
+  firstname?: string | null;
+  lastname?: string | null;
+  avatarUrl?: string | null;
+  isOwner: boolean;
+}
+
+export interface ChatroomDirectUserDetail {
+  id: string;
+  firstname?: string | null;
+  lastname?: string | null;
+  avatarUrl?: string | null;
+  bio?: string | null;
+  email: string;
+  totalFollowers: number;
+  totalFollowing: number;
+}
+
+export interface ChatroomDetail {
+  id: string;
+  isGroup: boolean;
+  name?: string | null;
+  avatarUrl?: string | null;
+  totalMessages: number;
+  totalPhotos: number;
+  totalMembers?: number | null;
+  members?: ChatroomMemberDetail[] | null;
+  directUser?: ChatroomDirectUserDetail | null;
+}

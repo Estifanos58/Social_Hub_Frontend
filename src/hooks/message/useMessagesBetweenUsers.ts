@@ -3,21 +3,13 @@ import { useQuery, useSubscription } from '@apollo/client/react';
 
 import { GET_MESSAGES } from '@/graphql/queries/message/getMessages';
 import { NEW_MESSAGE_SUBSCRIPTION } from '@/graphql/subscriptions/NewMessageSubscription';
-import { DEFAULT_AVATAR, MessageEdge } from '@/lib/types';
+import { ChatroomMeta, DEFAULT_AVATAR, MessageEdge } from '@/lib/types';
 
 interface UseMessagesBetweenUsersOptions {
   otherUserId: string;
   limit?: number;
   currentUserId?: string | null;
   skip?: boolean;
-}
-
-export interface ChatroomMeta {
-  id: string | null;
-  isGroup: boolean;
-  name: string;
-  avatarUrl?: string | null;
-  subtitle?: string | null;
 }
 
 interface MessagesBetweenUsersQuery {

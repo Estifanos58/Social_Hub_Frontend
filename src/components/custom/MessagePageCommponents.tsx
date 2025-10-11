@@ -1,4 +1,6 @@
 import { DEFAULT_AVATAR, MessageEdge } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Info } from "lucide-react";
 import { formatEditedTime, formatTime } from "@/lib/utils";
 import clsx from "clsx";
 
@@ -60,19 +62,38 @@ export const ChatHeader = ({
   name,
   avatarUrl,
   subtitle,
+  onShowDetail,
+  disableDetailButton = false,
 }: {
   isGroup: boolean;
   name: string;
   avatarUrl?: string | null;
   subtitle?: string | null;
+  onShowDetail?: () => void;
+  disableDetailButton?: boolean;
 }) => (
-  <div className="flex items-center gap-4 border-b border-white/10 bg-white/5 px-8 py-6 backdrop-blur">
-    <div className="h-16 w-16 overflow-hidden rounded-full border border-white/20 bg-white/10">
-      <img src={avatarUrl || DEFAULT_AVATAR} alt={name} className="h-full w-full object-cover" />
+  <div className="flex items-center justify-between gap-4 border-b border-white/10 bg-white/5 px-8 py-6 backdrop-blur">
+    <div className="flex items-center gap-4">
+      <div className="h-16 w-16 overflow-hidden rounded-full border border-white/20 bg-white/10">
+        <img src={avatarUrl || DEFAULT_AVATAR} alt={name} className="h-full w-full object-cover" />
+      </div>
+      <div>
+        <h2 className="text-2xl font-semibold text-white">{name}</h2>
+        <p className="text-sm text-white/60">{isGroup ? "Group chat" : subtitle ?? "Direct message"}</p>
+      </div>
     </div>
-    <div>
-      <h2 className="text-2xl font-semibold text-white">{name}</h2>
-      <p className="text-sm text-white/60">{isGroup ? 'Group chat' : subtitle ?? 'Direct message'}</p>
-    </div>
+    {onShowDetail && (
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={onShowDetail}
+        disabled={disableDetailButton}
+        className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+      >
+        <Info className="mr-2 h-4 w-4" />
+        View details
+      </Button>
+    )}
   </div>
 );
