@@ -6,6 +6,7 @@ import { ChatroomDetail } from "@/lib/types";
 
 interface UseChatroomDetailOptions {
   chatroomId?: string | null;
+  otherUserId?: string | null;
   enabled?: boolean;
   initialData?: Partial<ChatroomDetail> | null;
 }
@@ -16,16 +17,18 @@ interface ChatroomDetailQueryData {
 
 export const useChatroomDetail = ({
   chatroomId,
+  otherUserId,
   enabled = true,
   initialData,
 }: UseChatroomDetailOptions) => {
-  const shouldSkip = !enabled || !chatroomId;
+  const shouldSkip = !enabled || (!chatroomId && !otherUserId);
 
   const { data, loading, error, refetch } = useQuery<ChatroomDetailQueryData>(
     GET_CHATROOM_DETAIL,
     {
       variables: {
-        chatroomId: chatroomId ?? "",
+        chatroomId: chatroomId ?? null,
+        otherUserId: otherUserId ?? null,
       },
       skip: shouldSkip,
       fetchPolicy: "network-only",
@@ -33,12 +36,12 @@ export const useChatroomDetail = ({
   );
 
   const fallbackDetail = useMemo<ChatroomDetail | null>(() => {
-    if (!chatroomId) {
+    if (!chatroomId && !otherUserId) {
       return null;
     }
 
     return {
-      id: chatroomId,
+      id: initialData?.id ?? chatroomId ?? otherUserId ?? '',
       isGroup: initialData?.isGroup ?? false,
       name: initialData?.name ?? null,
       avatarUrl: initialData?.avatarUrl ?? null,
@@ -48,7 +51,7 @@ export const useChatroomDetail = ({
       members: initialData?.members ?? null,
       directUser: initialData?.directUser ?? null,
     };
-  }, [chatroomId, initialData?.avatarUrl, initialData?.directUser, initialData?.isGroup, initialData?.members, initialData?.name, initialData?.totalMembers, initialData?.totalMessages, initialData?.totalPhotos]);
+  }, [chatroomId, otherUserId, initialData?.avatarUrl, initialData?.directUser, initialData?.id, initialData?.isGroup, initialData?.members, initialData?.name, initialData?.totalMembers, initialData?.totalMessages, initialData?.totalPhotos]);
 
   const detail = useMemo<ChatroomDetail | null>(() => {
     if (data?.chatroomDetail) {
@@ -66,7 +69,7 @@ export const useChatroomDetail = ({
     loading,
     isInitialLoading,
     isFetching,
-  error,
+    error,
     refetch,
     hasRemoteDetail,
   };

@@ -13,6 +13,7 @@ interface ChatroomDetailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   chatroomId?: string | null;
+  otherUserId?: string;
   meta?: ChatroomMeta;
 }
 
@@ -66,10 +67,10 @@ const DetailHeader = ({ detail, isLoading }: DetailHeaderProps) => {
   );
 };
 
-export function ChatroomDetailModal({ open, onOpenChange, chatroomId, meta }: ChatroomDetailModalProps) {
-  const initialData = chatroomId && meta
+export function ChatroomDetailModal({ open, onOpenChange, chatroomId, otherUserId, meta }: ChatroomDetailModalProps) {
+  const initialData = meta
     ? {
-        id: chatroomId,
+        id: meta.id ?? chatroomId ?? otherUserId,
         isGroup: meta.isGroup,
         name: meta.name,
         avatarUrl: meta.avatarUrl,
@@ -78,12 +79,13 @@ export function ChatroomDetailModal({ open, onOpenChange, chatroomId, meta }: Ch
 
   const { detail, loading, isInitialLoading, error, refetch, hasRemoteDetail } = useChatroomDetail({
     chatroomId,
+    otherUserId: chatroomId ? undefined : otherUserId,
     enabled: open,
     initialData,
   });
 
-  const showContent = Boolean(detail && hasRemoteDetail);
   const showSkeleton = isInitialLoading;
+  const showContent = Boolean(detail && (hasRemoteDetail || !showSkeleton));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -125,9 +127,9 @@ export function ChatroomDetailModal({ open, onOpenChange, chatroomId, meta }: Ch
           {showContent && detail && (
             <div className="max-h-[50vh] space-y-6 overflow-y-auto pr-1">
               {detail.isGroup ? (
-                <GroupDetailSection detail={detail} isLoading={loading} />
+                <GroupDetailSection detail={detail} isLoading={loading && !hasRemoteDetail} />
               ) : (
-                <DirectDetailSection detail={detail} isLoading={loading} />
+                <DirectDetailSection detail={detail} isLoading={loading && !hasRemoteDetail} />
               )}
             </div>
           )}
@@ -214,8 +216,8 @@ const DirectDetailSection = ({ detail, isLoading }: DirectSectionProps) => {
     <div className="space-y-6">
       <StatsGrid
         stats={[
-          { label: "Messages", value: detail.totalMessages },
-          { label: "Shared photos", value: detail.totalPhotos },
+          { label: "Messages", value: detail.totalMessages ?? 0 },
+          { label: "Shared photos", value: detail.totalPhotos ?? 0 },
           { label: "Followers", value: directUser?.totalFollowers ?? 0 },
           { label: "Following", value: directUser?.totalFollowing ?? 0 },
         ]}

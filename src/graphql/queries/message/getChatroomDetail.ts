@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_CHATROOM_DETAIL = gql`
-  query ChatroomDetail($chatroomId: String!) {
-    chatroomDetail(chatroomId: $chatroomId) {
+  query ChatroomDetail($chatroomId: String, $otherUserId: String) {
+    chatroomDetail(chatroomId: $chatroomId, otherUserId: $otherUserId) {
       id
       isGroup
       name

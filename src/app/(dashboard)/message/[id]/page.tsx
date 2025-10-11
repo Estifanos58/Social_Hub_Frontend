@@ -108,6 +108,9 @@ export default function MessagePage({ params }: PageProps) {
   }, [chatroomMeta, setSelectedChatroomMeta]);
 
   const activeChatroomMeta = chatroomMeta?.id ? chatroomMeta : selectedChatroomMeta ?? chatroomMeta;
+  const isGroupChat = activeChatroomMeta?.isGroup ?? false;
+  const detailChatroomId = chatroomId ?? (isGroupChat ? id : null);
+  const detailOtherUserId = isGroupChat ? undefined : id;
 
   useEffect(() => {
     if (loading) return;
@@ -132,8 +135,7 @@ export default function MessagePage({ params }: PageProps) {
           ) : (
             <ChatHeader
               {...activeChatroomMeta}
-              onShowDetail={chatroomId ? () => setDetailOpen(true) : undefined}
-              disableDetailButton={!chatroomId}
+              onShowDetail={() => setDetailOpen(true)}
             />
           )}
         </div>
@@ -308,7 +310,8 @@ export default function MessagePage({ params }: PageProps) {
       <ChatroomDetailModal
         open={isDetailOpen}
         onOpenChange={setDetailOpen}
-        chatroomId={chatroomId}
+        chatroomId={detailChatroomId}
+        otherUserId={detailOtherUserId}
         meta={activeChatroomMeta}
       />
     </div>
