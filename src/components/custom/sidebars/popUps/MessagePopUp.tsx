@@ -1,14 +1,18 @@
 "use client";
 
-import { useRef } from "react";
+import type { ReactNode } from "react";
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 
 import Searching, { MessageSkeletonList } from "./Searching";
 import { useUserChatrooms } from "@/hooks/message/useUserChatrooms";
 import { userMessageStore } from "@/store/messageStore";
 import { formatRelative } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { CreateGroupModal } from "../../../modal/CreateGroupModal";
 
 
 interface MessagePopUpProps {
@@ -21,13 +25,25 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
   const router = useRouter();
   const { chatrooms, isInitialLoading, error, refetch } = useUserChatrooms();
   const setSelectedChatRoomId = userMessageStore((state) => state.setSelectedChatRoomId);
+  const [isCreateGroupOpen, setCreateGroupOpen] = useState(false);
 
-  const handleOpenChatroom = (chatroomId: string, routeId: string) => {
-    setSelectedChatRoomId(chatroomId);
-    setShowPopup(true);
-    setIsCollapsed(true);
-    router.push(`/message/${routeId}`);
-  };
+  const handleOpenChatroom = useCallback(
+    (chatroomId: string, routeId: string) => {
+      setSelectedChatRoomId(chatroomId);
+      setShowPopup(true);
+      setIsCollapsed(true);
+      router.push(`/message/${routeId}`);
+    },
+    [router, setIsCollapsed, setSelectedChatRoomId, setShowPopup],
+  );
+
+  const handleGroupCreated = useCallback(
+    async (chatroomId: string) => {
+      await refetch();
+      handleOpenChatroom(chatroomId, chatroomId);
+    },
+    [handleOpenChatroom, refetch],
+  );
 
   const renderChatroomList = () => {
     if (isInitialLoading) {
@@ -59,45 +75,95 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
       );
     }
 
-    return (
-      <div className="space-y-3">
-        {chatrooms.map((chatroom) => {
-          const lastMessage = chatroom.lastMessage;
-          const lastMessagePreview = lastMessage
-            ? lastMessage.content?.trim()
-              ? lastMessage.content.trim()
-              : lastMessage.imageUrl
-              ? "Sent a photo"
-              : "New chat"
-            : "Start the conversation";
-          const timestamp = lastMessage?.createdAt
-            ? formatRelative(lastMessage.createdAt)
-            : "";
+    const directMessages = chatrooms.filter((chatroom) => !chatroom.isGroup);
+    const groupChats = chatrooms.filter((chatroom) => chatroom.isGroup);
 
-          return (
-            <button
-              key={chatroom.id}
+    const renderSection = (
+      title: string,
+      rooms: typeof chatrooms,
+  emptyState: string,
+  action?: ReactNode,
+    ) => (
+      <div className="flex h-1/2 flex-col">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+              {title}
+            </h3>
+            {action}
+          </div>
+          <span className="text-xs text-white/40">{rooms.length}</span>
+        </div>
+        <div className="mt-3 flex-1 overflow-y-auto">
+          {rooms.length === 0 ? (
+            <div className="flex h-full items-center justify-center text-center text-xs text-gray-500">
+              {emptyState}
+            </div>
+          ) : (
+            <div className="space-y-3 pr-1">
+              {rooms.map((chatroom) => {
+                const lastMessage = chatroom.lastMessage;
+                const lastMessagePreview = lastMessage
+                  ? lastMessage.content?.trim()
+                    ? lastMessage.content.trim()
+                    : lastMessage.imageUrl
+                    ? "Sent a photo"
+                    : "New chat"
+                  : "Start the conversation";
+                const timestamp = lastMessage?.createdAt
+                  ? formatRelative(lastMessage.createdAt)
+                  : "";
+
+                return (
+                  <button
+                    key={chatroom.id}
+                    type="button"
+                    onClick={() => handleOpenChatroom(chatroom.id, chatroom.routeId)}
+                    className="flex w-full items-center justify-between rounded-lg bg-gray-900/40 p-3 text-left transition hover:bg-gray-900"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={chatroom.avatarUrl}
+                        alt={chatroom.name}
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-white">{chatroom.name}</p>
+                        <p className="line-clamp-1 text-xs text-gray-400">{lastMessagePreview}</p>
+                      </div>
+                    </div>
+                    {timestamp && <span className="text-xs text-gray-500">{timestamp}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="flex h-full flex-col gap-6">
+        {renderSection("Direct Messages", directMessages, "No direct messages yet.")}
+        {renderSection(
+          "Group Chats",
+          groupChats,
+          "No group chats yet.",
+          (
+            <Button
               type="button"
-              onClick={() => handleOpenChatroom(chatroom.id, chatroom.routeId)}
-              className="flex w-full items-center justify-between rounded-lg bg-gray-900/40 p-3 text-left transition hover:bg-gray-900"
+              variant="ghost"
+              size="icon"
+              onClick={() => setCreateGroupOpen(true)}
+              className="size-8 text-white/70"
             >
-              <div className="flex items-center gap-3">
-                <Image
-                  src={chatroom.avatarUrl}
-                  alt={chatroom.name}
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-white">{chatroom.name}</p>
-                  <p className="line-clamp-1 text-xs text-gray-400">{lastMessagePreview}</p>
-                </div>
-              </div>
-              {timestamp && <span className="text-xs text-gray-500">{timestamp}</span>}
-            </button>
-          );
-        })}
+              <Plus className="h-4 w-4" />
+              <span className="sr-only">Create group chat</span>
+            </Button>
+          ),
+        )}
       </div>
     );
   };
@@ -125,6 +191,11 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
             {renderChatroomList()}
           </>
         }
+      />
+      <CreateGroupModal
+        open={isCreateGroupOpen}
+        onOpenChange={setCreateGroupOpen}
+        onCreated={handleGroupCreated}
       />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useGeneralStore } from '@/store/generalStore'
 import React from 'react'
-import { PostDetailModal } from '../custom/PostDetailModal'
+import { PostDetailModal } from '../modal/PostDetailModal'
 
 function Modal() {
       const { selectedPost, setSelectedPost} = useGeneralStore()

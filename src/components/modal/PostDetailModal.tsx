@@ -5,15 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MoreHorizontal } from "lucide-react";
 import { SelectedPost } from "@/store/generalStore";
-import { CommentSection } from "./CommentSection";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { ReactionBar } from "../shared/ReactionBar";
 import React from "react";
 import { CommentSkeletonList } from "../shared/skeleton/CommentSkeleton";
-import { CommentItem } from "./CommentItem";
+
 import { usePostDetailModal, sliderSettings } from "../../hooks/post/usePostDetailModal";
+import { CommentItem } from "../custom/CommentItem";
+import { CommentSection } from "../custom/CommentSection";
 
 interface PostDetailModalProps {
   isOpen: boolean;
