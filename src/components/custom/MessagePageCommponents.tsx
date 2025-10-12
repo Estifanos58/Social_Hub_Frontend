@@ -3,10 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Info } from "lucide-react";
 import { formatEditedTime, formatTime } from "@/lib/utils";
 import clsx from "clsx";
+import Image from "next/image";
 
 export const Avatar = ({ src, alt }: { src?: string | null; alt: string }) => (
-  <div className="h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/10">
-    <img src={src || DEFAULT_AVATAR} alt={alt} className="h-full w-full object-cover" />
+  <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/10">
+    <Image
+      src={src || DEFAULT_AVATAR}
+      alt={alt}
+      fill
+      sizes="40px"
+      className="object-cover"
+    />
   </div>
 );
 
@@ -29,11 +36,16 @@ export const MessageBubble = ({ message, isOwn }: { message: MessageEdge; isOwn:
         <p className="mt-2 whitespace-pre-wrap text-sm text-white/90">{message.content}</p>
       )}
       {message.imageUrl && (
-        <div className="mt-3 overflow-hidden rounded-lg border border-white/10">
-          <img
+        <div
+          className="relative mt-3 w-full overflow-hidden rounded-lg border border-white/10"
+          style={{ minHeight: 200 }}
+        >
+          <Image
             src={message.imageUrl}
             alt="message attachment"
-            className="max-h-64 w-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 600px"
+            className="object-cover"
           />
         </div>
       )}
@@ -74,8 +86,14 @@ export const ChatHeader = ({
 }) => (
   <div className="flex items-center justify-between gap-4 border-b border-white/10 bg-white/5 px-8 py-6 backdrop-blur">
     <div className="flex items-center gap-4">
-      <div className="h-16 w-16 overflow-hidden rounded-full border border-white/20 bg-white/10">
-        <img src={avatarUrl || DEFAULT_AVATAR} alt={name} className="h-full w-full object-cover" />
+      <div className="relative h-16 w-16 overflow-hidden rounded-full border border-white/20 bg-white/10">
+        <Image
+          src={avatarUrl || DEFAULT_AVATAR}
+          alt={name}
+          fill
+          sizes="64px"
+          className="object-cover"
+        />
       </div>
       <div>
         <h2 className="text-2xl font-semibold text-white">{name}</h2>
