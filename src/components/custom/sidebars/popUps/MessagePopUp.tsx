@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 
 import Searching, { MessageSkeletonList } from "./Searching";
-import { useUserChatrooms } from "@/hooks/message/useUserChatrooms";
+import { useUserChatrooms } from "@/hooks/chatroom/useUserChatrooms";
 import { userMessageStore } from "@/store/messageStore";
 import { formatRelative } from "@/lib/utils";
 import { ChatroomMeta, ChatroomListItem, DEFAULT_AVATAR } from "@/lib/types";

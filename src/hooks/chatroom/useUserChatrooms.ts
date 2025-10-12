@@ -7,6 +7,7 @@ import { userMessageStore } from "@/store/messageStore";
 import { ChatroomListItem } from "@/lib/types";
 import { buildChatroomListItem, ChatroomQueryEdge } from "./chatroomList.helpers";
 import { useChatroomCreatedSubscription } from "./useChatroomCreatedSubscription";
+import { useUserAddedToChatroomSubscription } from "./useUserAddedToChatroomSubscription";
 
 interface GetUserChatroomsQueryData {
   GetUserChatrooms: {
@@ -72,6 +73,11 @@ export const useUserChatrooms = (): UseUserChatroomsResult => {
   useChatroomCreatedSubscription({
     enabled: Boolean(currentUserId),
     onChatroomCreated: upsertChatroom,
+  });
+
+  useUserAddedToChatroomSubscription({
+    enabled: Boolean(currentUserId),
+    onChatroomAdded: upsertChatroom,
   });
 
   return {

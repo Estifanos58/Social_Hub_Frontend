@@ -4,7 +4,7 @@ import type { MessageEdge } from '@/lib/types';
 import { useCloudinaryImageUpload } from '@/hooks/useCloudinaryImageUpload';
 import { toast } from 'sonner';
 import { userMessageStore } from '@/store/messageStore';
-import { buildChatroomListItemFromMessageEdge } from './chatroomList.helpers';
+import { buildChatroomListItemFromMessageEdge } from '../chatroom/chatroomList.helpers';
 
 interface CreateMessageVariables {
   chatroomId?: string | null;
@@ -19,6 +19,7 @@ interface UseMessageComposerOptions {
   chatroomId: string | null;
   otherUserId: string;
   currentUserId?: string | null;
+  isGroupChat?: boolean;
   isSending: boolean;
   sendMessage: SendMessageFunction;
   onMessageSent: (message: MessageEdge) => void;
@@ -50,6 +51,7 @@ export const useMessageComposer = ({
   chatroomId,
   otherUserId,
   currentUserId,
+  isGroupChat = false,
   isSending,
   sendMessage,
   onMessageSent,
@@ -115,10 +117,12 @@ export const useMessageComposer = ({
         }
       }
 
+      const effectiveChatroomId = chatroomId ?? (isGroupChat ? otherUserId : null);
+
       const response = await sendMessage({
         variables: {
-          chatroomId: chatroomId ?? null,
-          otherUserId: chatroomId ? null : otherUserId,
+          chatroomId: effectiveChatroomId,
+          otherUserId: effectiveChatroomId ? null : otherUserId,
           content: trimmedMessage.length > 0 ? trimmedMessage : null,
           imageUrl,
         },
@@ -152,6 +156,7 @@ export const useMessageComposer = ({
     notifyError,
     onMessageSent,
     otherUserId,
+    isGroupChat,
     currentUserId,
     resetInputState,
     selectedImage,

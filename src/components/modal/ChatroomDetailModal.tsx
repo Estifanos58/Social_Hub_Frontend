@@ -8,7 +8,7 @@ import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useChatroomDetail } from "@/hooks/message/useChatroomDetail";
+import { useChatroomDetail } from "@/hooks/chatroom/useChatroomDetail";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useUserStore } from "@/store/userStore";
 import { DEFAULT_AVATAR, ChatroomDetail, ChatroomMemberDetail } from "@/lib/types";

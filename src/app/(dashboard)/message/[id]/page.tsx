@@ -67,6 +67,9 @@ export default function MessagePage({ params }: PageProps) {
 
   const [sendMessage, { loading: sending }] = useMutation(CREATE_MESSAGE);
 
+  const activeChatroomMeta = chatroomMeta?.id ? chatroomMeta : selectedChatroomMeta ?? chatroomMeta;
+  const isGroupChat = activeChatroomMeta?.isGroup ?? false;
+
   const {
     messageInput,
     handleInputChange,
@@ -89,6 +92,7 @@ export default function MessagePage({ params }: PageProps) {
     chatroomId,
     otherUserId: id,
     currentUserId: user?.id ?? null,
+    isGroupChat,
     isSending: sending,
     sendMessage,
     onMessageSent: addMessage,
@@ -107,8 +111,6 @@ export default function MessagePage({ params }: PageProps) {
     }
   }, [chatroomMeta, setSelectedChatroomMeta]);
 
-  const activeChatroomMeta = chatroomMeta?.id ? chatroomMeta : selectedChatroomMeta ?? chatroomMeta;
-  const isGroupChat = activeChatroomMeta?.isGroup ?? false;
   const detailChatroomId = chatroomId ?? (isGroupChat ? id : null);
   const detailOtherUserId = isGroupChat ? undefined : id;
 
