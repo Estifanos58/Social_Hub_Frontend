@@ -11,7 +11,7 @@ export default function UserBootstrapper() {
     fetchPolicy: "network-only",
   });
 
-  console.log("UserBootstrapper data:", data);
+  // console.log("UserBootstrapper data:", data);
   const { setUser } = useUserStore();
 
   useEffect(() => {

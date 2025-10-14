@@ -251,7 +251,7 @@ const AddMembersDialog = ({
     fetchPolicy: "network-only",
   });
 
-  const [addUsers, { loading: addLoading, error: addError }] = useMutation(ADD_USERS_TO_CHATROOM);
+  const [addUsers, { loading: addLoading, error: addError }] = useMutation<any>(ADD_USERS_TO_CHATROOM);
 
   useEffect(() => {
     if (!open) {
