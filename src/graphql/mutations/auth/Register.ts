@@ -15,6 +15,8 @@ export const REGISTER_USER = gql`
         password: $password
       }
     ) {
+        accessToken
+        refreshToken
       user {
         id
         firstname

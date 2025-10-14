@@ -4,12 +4,36 @@ import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-import { LoginMutation, RegisterMutation } from "@/gql/graphql";
 import { LOGIN_USER } from "@/graphql/mutations/auth/LoginUser";
 import { REGISTER_USER } from "@/graphql/mutations/auth/Register";
 import { Login, SignUp } from "@/validator/Auth.validator";
 import { useUserStore } from "@/store/userStore";
-import { getCookie } from "@/app/test";
+
+type AuthPayload = {
+  user?: any;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+};
+
+type RegisterResponse = {
+  register?: AuthPayload | null;
+};
+
+type RegisterVariables = {
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+};
+
+type LoginResponse = {
+  login?: AuthPayload | null;
+};
+
+type LoginVariables = {
+  email: string;
+  password: string;
+};
 
 interface FormState {
   firstname: string;
@@ -49,12 +73,27 @@ export const useAuthForm = () => {
   const [errors, setErrors] = useState<ErrorState>(initialErrorState);
 
   const navigate = useRouter();
-  const { setUser } = useUserStore();
+  const { setUser, setAccessToken } = useUserStore();
+
+  const persistTokens = useCallback(
+    (accessToken?: string | null, refreshToken?: string | null) => {
+      setAccessToken(accessToken ?? null);
+
+      if (typeof window !== "undefined") {
+        if (refreshToken) {
+          window.localStorage.setItem("refreshToken", refreshToken);
+        } else {
+          window.localStorage.removeItem("refreshToken");
+        }
+      }
+    },
+    [setAccessToken],
+  );
 
   const [registerUser, { loading: registerLoading }] =
-    useMutation<RegisterMutation>(REGISTER_USER);
+    useMutation<RegisterResponse, RegisterVariables>(REGISTER_USER);
   const [loginUser, { loading: loginLoading }] =
-    useMutation<LoginMutation>(LOGIN_USER);
+    useMutation<LoginResponse, LoginVariables>(LOGIN_USER);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -98,8 +137,11 @@ export const useAuthForm = () => {
               password: registerData.password,
             },
             onCompleted: (data) => {
-              if (data?.register?.user) {
-                setUser(mapUserForStore(data.register.user));
+              const auth = data?.register;
+              persistTokens(auth?.accessToken ?? null, auth?.refreshToken ?? null);
+
+              if (auth?.user) {
+                setUser(mapUserForStore(auth.user));
                 navigate.push("/auth/verify");
                 toast.success("Registration successful!");
               }
@@ -117,11 +159,14 @@ export const useAuthForm = () => {
               password: loginData.password,
             },
             onCompleted: (data) => {
-              if (data?.login?.user) {
-                setUser(mapUserForStore(data.login.user));
+              const auth = data?.login;
+
+              persistTokens(auth?.accessToken ?? null, auth?.refreshToken ?? null);
+
+              if (auth?.user) {
+                setUser(mapUserForStore(auth.user));
                 toast.success("Login successful!");
                 navigate.push("/");
-                getCookie();
               }
             },
           }).catch((err) => {
@@ -142,7 +187,7 @@ export const useAuthForm = () => {
         }
       }
     },
-    [formData, isLogin, loginUser, registerUser, setUser, navigate, mapUserForStore],
+    [formData, isLogin, loginUser, registerUser, setUser, navigate, mapUserForStore, persistTokens],
   );
 
   const loading = useMemo(() => (isLogin ? loginLoading : registerLoading), [isLogin, loginLoading, registerLoading]);

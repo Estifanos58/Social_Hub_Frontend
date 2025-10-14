@@ -18,7 +18,10 @@ interface User {
 
 interface UserState {
   user: User | null;
+  accessToken: string | null;
   setUser: (input: User) => void;
+  setAccessToken: (token: string | null) => void;
+  clearAuth: () => void;
   usersToFollow: User[];
   setUsersToFollow: (input: User[]) => void;
   removeUserFromToFollow: (userId: string) => void;
@@ -26,7 +29,10 @@ interface UserState {
 
 export const useUserStore = create<UserState>((set) => ({
   user: null,
+  accessToken: null,
   setUser: (input: User) => set({ user: input }),
+  setAccessToken: (token: string | null) => set({ accessToken: token }),
+  clearAuth: () => set({ user: null, accessToken: null, usersToFollow: [] }),
 
   usersToFollow: [] as User[],
   setUsersToFollow: (input: User[]) => set({ usersToFollow: input }),
