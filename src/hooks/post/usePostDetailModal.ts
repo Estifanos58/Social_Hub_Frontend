@@ -204,7 +204,7 @@ export const usePostDetailModal = (post: SelectedPost | null) => {
 
   const createdAtLabel = useMemo(
     () => buildCreatedAtLabel(resolvedPost),
-    [resolvedPost?.createdAt],
+    [resolvedPost],
   );
 
   const postId = resolvedPost?.id ?? post?.id;

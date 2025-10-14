@@ -9,6 +9,7 @@ import { LOGIN_USER } from "@/graphql/mutations/auth/LoginUser";
 import { REGISTER_USER } from "@/graphql/mutations/auth/Register";
 import { Login, SignUp } from "@/validator/Auth.validator";
 import { useUserStore } from "@/store/userStore";
+import { getCookie } from "@/app/test";
 
 interface FormState {
   firstname: string;
@@ -120,6 +121,7 @@ export const useAuthForm = () => {
                 setUser(mapUserForStore(data.login.user));
                 toast.success("Login successful!");
                 navigate.push("/");
+                getCookie();
               }
             },
           }).catch((err) => {

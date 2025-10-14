@@ -99,8 +99,9 @@ export const useTypping = (chatroomId: string | null, currentUserId: string | nu
   }, [chatroomId, currentUserId, handleUserStoppedTyping, userStartedTypingMutation])
 
   useEffect(() => {
+    const timeoutsSnapshot = typingTimeoutsRef.current
     return () => {
-      Object.values(typingTimeoutsRef.current).forEach((timeoutId) => clearTimeout(timeoutId))
+      Object.values(timeoutsSnapshot).forEach((timeoutId) => clearTimeout(timeoutId))
     }
   }, [])
 

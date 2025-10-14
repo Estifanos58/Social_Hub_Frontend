@@ -20,6 +20,7 @@ export const useVerifyEmailForm = (): UseVerifyEmailFormReturn => {
   const [codes, setCodes] = useState<string[]>(["", "", "", ""]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter()
+  const codesLength = codes.length;
 
   const [verifyEmail, { loading }] = useMutation<VerifyEmailMutation>(VERIFY_EMAIL);
 
@@ -47,9 +48,9 @@ export const useVerifyEmailForm = (): UseVerifyEmailFormReturn => {
     if (/^\d+$/.test(pasteData)) {
       const newCodes = pasteData.split("");
       setCodes((prev) => prev.map((_, i) => newCodes[i] || ""));
-      inputRefs.current[Math.min(pasteData.length, codes.length - 1)]?.focus();
+      inputRefs.current[Math.min(pasteData.length, codesLength - 1)]?.focus();
     }
-  }, []);
+  }, [codesLength]);
 
   const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
@@ -80,7 +81,7 @@ export const useVerifyEmailForm = (): UseVerifyEmailFormReturn => {
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
-  }, [codes, verifyEmail]);
+  }, [codes, verifyEmail, router]);
 
   return {
     codes,
