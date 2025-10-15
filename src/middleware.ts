@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = [
@@ -37,10 +36,22 @@ const redirectToAuth = (request: NextRequest) => {
   return NextResponse.redirect(loginUrl);
 };
 
-const hasAccessToken = (request: NextRequest): boolean => {
-  return Boolean(
-    request.cookies.get("accessToken")?.value 
-  );
+const extractTokens = (request: NextRequest) => {
+  const authorization = request.headers.get("authorization");
+  const fromAuthHeader = authorization?.startsWith("Bearer ")
+    ? authorization.slice(7)
+    : undefined;
+
+  const accessToken =
+    fromAuthHeader ??
+    request.headers.get("x-access-token") ??
+    undefined;
+
+  const refreshToken =
+    request.headers.get("x-refresh-token") ??
+    undefined;
+
+  return { accessToken, refreshToken };
 };
 
 export async function middleware(request: NextRequest) {
@@ -48,11 +59,6 @@ export async function middleware(request: NextRequest) {
 
   if (shouldBypass(pathname) || isPublicRoute(pathname)) {
     return NextResponse.next();
-  }
-
-
-  if (!hasAccessToken(request)) {
-    return redirectToAuth(request);
   }
 
   const endpoint = process.env.NEXT_PUBLIC_API_URL || "https://social-hub-backend-bl70.onrender.com/graphql";
@@ -63,13 +69,27 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const cookieHeader = request.headers.get("cookie") ?? "";
+    const { accessToken, refreshToken } = extractTokens(request);
+
+    if (!accessToken && !refreshToken) {
+      return NextResponse.next();
+    }
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    if (refreshToken) {
+      headers["x-refresh-token"] = refreshToken;
+    }
+
     const response = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        cookie: cookieHeader,
-      },
+      headers,
       body: JSON.stringify({ query: GRAPHQL_INTROSPECTION_QUERY }),
       cache: "no-store",
     });
@@ -87,9 +107,21 @@ export async function middleware(request: NextRequest) {
       return redirectToAuth(request);
     }
 
-    return NextResponse.next();
+    const nextResponse = NextResponse.next();
+    const forwardedAccess = response.headers.get("x-access-token");
+    const forwardedRefresh = response.headers.get("x-refresh-token");
+
+    if (forwardedAccess) {
+      nextResponse.headers.set("x-access-token", forwardedAccess);
+    }
+
+    if (forwardedRefresh) {
+      nextResponse.headers.set("x-refresh-token", forwardedRefresh);
+    }
+
+    return nextResponse;
   } catch {
-    return redirectToAuth(request);
+    return NextResponse.next();
   }
 }
 
