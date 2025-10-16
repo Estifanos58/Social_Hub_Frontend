@@ -5,7 +5,7 @@ import "./globals.css";
 import { ApolloProvider } from "@apollo/client/react";
 import { client } from "../../apolloClient";
 import { Toaster } from "@/components/ui/sonner";
-import UserBootstrapper from "@/components/custom/ProtectedRoute";
+import ProtectedRoute from "@/components/custom/ProtectedRoute";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +29,7 @@ export default function RootLayout({
       >
         <ApolloProvider client={client}>
           <Toaster />
-          <UserBootstrapper />
-          {children}
+          <ProtectedRoute>{children}</ProtectedRoute>
         </ApolloProvider>
       </body>
     </html>
