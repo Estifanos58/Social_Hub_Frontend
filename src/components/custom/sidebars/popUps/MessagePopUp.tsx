@@ -114,6 +114,7 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
           </div>
           <span className="text-xs text-white/40">{rooms.length}</span>
         </div>
+        <div className="mt-3 bg-white/20 h-[0.1px]" />
         <div className="mt-3 flex-1 overflow-y-auto">
           {rooms.length === 0 ? (
             <div className="flex h-full items-center justify-center text-center text-xs text-gray-500">
@@ -140,7 +141,7 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
                     key={chatroom.id}
                     type="button"
                     onClick={() => handleOpenChatroom(chatroom.id, chatroom.routeId, chatroomMeta)}
-                    className="flex w-full items-center justify-between rounded-lg bg-gray-900/40 p-3 text-left transition hover:bg-gray-900"
+                    className="flex w-full items-center justify-between rounded-lg bg-gray-900/40 p-3 text-left transition hover:bg-gray-700"
                   >
                     <div className="flex items-center gap-3">
                       <Image
