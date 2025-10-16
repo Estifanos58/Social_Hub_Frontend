@@ -6,6 +6,7 @@ import { ApolloProvider } from "@apollo/client/react";
 import { client } from "../../apolloClient";
 import { Toaster } from "@/components/ui/sonner";
 import ProtectedRoute from "@/components/custom/ProtectedRoute";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,9 @@ export default function RootLayout({
       >
         <ApolloProvider client={client}>
           <Toaster />
-          <ProtectedRoute>{children}</ProtectedRoute>
+          <Suspense fallback={null}>
+            <ProtectedRoute>{children}</ProtectedRoute>
+          </Suspense>
         </ApolloProvider>
       </body>
     </html>
