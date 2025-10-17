@@ -561,6 +561,7 @@ const DirectDetailSection = ({ detail, isLoading }: DirectSectionProps) => {
       />
 
       {directUser ? (
+        <Link href={`/profile/${directUser.id}`}>
         <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5">
           <div className="flex items-center gap-4">
             <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-white/10 bg-white/10">
@@ -587,6 +588,8 @@ const DirectDetailSection = ({ detail, isLoading }: DirectSectionProps) => {
             </div>
           )}
         </div>
+        </Link>
+
       ) : (
         !isLoading && (
           <p className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/60">
