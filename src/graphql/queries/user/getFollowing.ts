@@ -7,7 +7,7 @@ export const GET_FOLLOWING = gql`
                 id
                 firstname
                 avatarUrl
-                email
+                bio
             }
             totalFollowers
             totalFollowing

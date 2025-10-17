@@ -10,6 +10,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useRouter } from "next/navigation";
 import { userMessageStore } from "@/store/messageStore";
 import { DEFAULT_AVATAR } from "@/lib/types";
+import { formatBio } from "@/lib/utils";
 
 interface SearchingProps {
   defaultContent: ReactNode;
@@ -25,7 +26,8 @@ interface SearchUsersQueryData {
       id: string;
       firstname: string;
       lastname: string | null;
-      email: string;
+  bio: string | null;
+  email: string;
       avatarUrl: string | null;
     }>;
   };
@@ -97,14 +99,16 @@ function Searching({
     setSearchTerm(event.target.value);
   };
 
-  const handleMessageRoute = (user: SearchUsersQueryData['SearchUsers']['users'][number]) => {
+
+
+  const handleMessageRoute = (user: SearchUsersQueryData["SearchUsers"]["users"][number]) => {
     setSelectedChatRoomId(null);
     setSelectedChatroomMeta({
       id: null,
       isGroup: false,
       name: user.firstname,
       avatarUrl: user.avatarUrl ?? DEFAULT_AVATAR,
-      subtitle: user.email,
+  subtitle: user.bio ?? "",
     });
     router.replace(`/message/${user.id}`)
   }
@@ -163,7 +167,7 @@ function Searching({
                       <p className="text-white font-medium">
                         {user.firstname} {user.lastname ?? ""}
                       </p>
-                      <p className="text-gray-400 text-sm">{user.email}</p>
+                      <p className="text-gray-400 text-sm">{formatBio(user.bio)}</p>
                     </div>
                   </div>
                   <span className="text-xs font-semibold text-gray-500 uppercase">

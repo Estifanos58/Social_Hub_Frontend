@@ -8,7 +8,7 @@ export const SEARCH_USERS = gql`
         id
         firstname
         lastname
-        email
+        bio
         avatarUrl
       }
     }

@@ -56,3 +56,14 @@ export const formatRelative = (iso: string): string => {
     }
   };
   
+
+  export   const formatBio = (rawBio: string | null) => {
+      if (!rawBio) {
+        return "No bio yet";
+      }
+      const trimmed = rawBio.trim();
+      if (trimmed.length <= 15) {
+        return trimmed;
+      }
+      return `${trimmed.slice(0, 15)}...`;
+    };

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useFollowersPopup } from "../../../../hooks/user/useFollowersPopup";
+import { formatBio } from "@/lib/utils";
 
 interface FollowersPopUpProps {
   setShowPopup: (value: boolean) => void;
@@ -107,7 +108,7 @@ function FollowersPopUp({ setShowPopup, setIsCollapsed }: FollowersPopUpProps) {
                 />
                 <div>
                   <p className="text-white font-medium">{user.firstname}</p>
-                  <p className="text-gray-400 text-sm">{user.email}</p>
+                  <p className="text-gray-400 text-sm">{formatBio(user.bio)}</p>
                 </div>
               </div>
               <button
