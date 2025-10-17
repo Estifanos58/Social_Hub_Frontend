@@ -16,16 +16,70 @@ import {
 } from "@/components/shared/skeleton/MessagePageSkeleton";
 import { useMessageComposer } from "@/hooks/message/useMessageComposer";
 import { useMessagesBetweenUsers } from "@/hooks/message/useMessagesBetweenUsers";
-import { ChatHeader, MessageBubble } from "@/components/custom/MessagePageCommponents";
+import { Avatar, ChatHeader, MessageBubble } from "@/components/custom/MessagePageCommponents";
 import { useTypping } from "@/hooks/message/useTypping";
 import { ChatroomDetailModal } from "@/components/modal/ChatroomDetailModal";
 import { userMessageStore } from "@/store/messageStore";
+import type { MessageEdge } from "@/lib/types";
 
 interface PageProps {
   params: Promise<{
     id: string;
   }>;
 }
+
+type PendingMessageState = {
+  id: string;
+  content: string;
+  imagePreview: string | null;
+  progress: number | null;
+};
+
+const PendingMessageBubble = ({
+  message,
+  userName,
+  avatarUrl,
+}: {
+  message: PendingMessageState;
+  userName: string;
+  avatarUrl?: string | null;
+}) => (
+  <div className="flex items-start justify-start gap-3 opacity-80">
+    <Avatar src={avatarUrl} alt={`${userName} avatar`} />
+    <div className="max-w-lg rounded-2xl border border-white/10 bg-emerald-500/10 p-4 shadow-lg backdrop-blur">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-white">{userName}</p>
+        <div className="flex items-center gap-2 text-xs text-white/70">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Sending…</span>
+        </div>
+      </div>
+      {message.content && (
+        <p className="mt-2 whitespace-pre-wrap text-sm text-white/90">{message.content}</p>
+      )}
+      {message.imagePreview && (
+        <div
+          className="relative mt-3 w-full overflow-hidden rounded-lg border border-white/10"
+          style={{ minHeight: 200 }}
+        >
+          <img
+            src={message.imagePreview}
+            alt="Uploading attachment"
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/60 text-white">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span className="text-xs">
+              {message.progress !== null
+                ? `Uploading… ${Math.round(message.progress)}%`
+                : "Uploading…"}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+);
 
 export default function MessagePage({ params }: PageProps) {
   const resolvedParams = use(params);
@@ -35,6 +89,8 @@ export default function MessagePage({ params }: PageProps) {
   const [isDetailOpen, setDetailOpen] = useState(false);
   const selectedChatroomMeta = userMessageStore((state) => state.selectedChatroomMeta);
   const setSelectedChatroomMeta = userMessageStore((state) => state.setSelectedChatroomMeta);
+  const [pendingMessage, setPendingMessage] = useState<PendingMessageState | null>(null);
+  const pendingMessageIdRef = useRef<string | null>(null);
 
   const scrollToBottom = useCallback(
     (behavior: "auto" | "smooth" = "smooth") => {
@@ -70,10 +126,28 @@ export default function MessagePage({ params }: PageProps) {
   const activeChatroomMeta = chatroomMeta?.id ? chatroomMeta : selectedChatroomMeta ?? chatroomMeta;
   const isGroupChat = activeChatroomMeta?.isGroup ?? false;
 
+  const handleMessageSent = useCallback(
+    (message: MessageEdge) => {
+      setPendingMessage((current) => {
+        if (current && current.id === pendingMessageIdRef.current) {
+          return null;
+        }
+        return current;
+      });
+      pendingMessageIdRef.current = null;
+      addMessage(message);
+    },
+    [addMessage],
+  );
+
+  const handleComposerError = useCallback(() => {
+    setPendingMessage(null);
+    pendingMessageIdRef.current = null;
+  }, []);
+
   const {
     messageInput,
     handleInputChange,
-    handleKeyDown,
     handleSendMessage,
     handleEmojiSelect,
     toggleEmojiPicker,
@@ -95,7 +169,8 @@ export default function MessagePage({ params }: PageProps) {
     isGroupChat,
     isSending: sending,
     sendMessage,
-    onMessageSent: addMessage,
+    onMessageSent: handleMessageSent,
+    onError: handleComposerError,
   });
 
   const { typingUsers, handleUserStartedTyping, handleUserStoppedTyping } = useTypping(
@@ -104,6 +179,17 @@ export default function MessagePage({ params }: PageProps) {
   );
 
   const isSending = sending || isUploading;
+
+  useEffect(() => {
+    if (!pendingMessage?.imagePreview) return;
+    if (uploadProgress === null) return;
+
+    setPendingMessage((current) => {
+      if (!current || !current.imagePreview) return current;
+      if (current.progress === uploadProgress) return current;
+      return { ...current, progress: uploadProgress };
+    });
+  }, [pendingMessage, uploadProgress]);
 
   useEffect(() => {
     if (chatroomMeta?.id) {
@@ -119,6 +205,40 @@ export default function MessagePage({ params }: PageProps) {
     const behavior = sortedMessages.length <= 1 ? "auto" : "smooth";
     scrollToBottom(behavior);
   }, [loading, scrollToBottom, sortedMessages]);
+
+  const handleSendMessageWithPending = useCallback(async () => {
+    if (!canSend) return;
+
+    const pendingId = `pending-${Date.now()}`;
+    const trimmedContent = messageInput.trim();
+
+    pendingMessageIdRef.current = pendingId;
+
+    setPendingMessage({
+      id: pendingId,
+      content: trimmedContent,
+      imagePreview: selectedImage?.preview ?? null,
+      progress: selectedImage ? 0 : null,
+    });
+
+    scrollToBottom("smooth");
+
+    const success = await handleSendMessage();
+    await handleUserStoppedTyping();
+
+    setPendingMessage((current) => {
+      if (!current || current.id !== pendingId) return current;
+      return null;
+    });
+
+    if (pendingMessageIdRef.current === pendingId) {
+      pendingMessageIdRef.current = null;
+    }
+
+    if (!success) {
+      return;
+    }
+  }, [canSend, handleSendMessage, handleUserStoppedTyping, messageInput, scrollToBottom, selectedImage]);
 
   if (!user) {
     return (
@@ -152,10 +272,7 @@ export default function MessagePage({ params }: PageProps) {
                 Failed to load messages. Please try again later.
               </div>
             )}
-            {!loading && !error && sortedMessages.length === 0 && (
-              <EmptyState />
-            )}
-            {!loading && !error && sortedMessages.length > 0 && (
+            {!loading && !error && (sortedMessages.length > 0 || pendingMessage) && (
               <div className="flex flex-col gap-6">
                 {sortedMessages.map((message) => (
                   <MessageBubble
@@ -164,7 +281,18 @@ export default function MessagePage({ params }: PageProps) {
                     isOwn={message.user?.id === user.id}
                   />
                 ))}
+                {pendingMessage && (
+                  <PendingMessageBubble
+                    key={pendingMessage.id}
+                    message={pendingMessage}
+                    userName={user.firstname}
+                    avatarUrl={user.avatarUrl}
+                  />
+                )}
               </div>
+            )}
+            {!loading && !error && sortedMessages.length === 0 && !pendingMessage && (
+              <EmptyState />
             )}
             {typingUsers.length > 0 && (
               <div className="mt-2 text-sm text-white">
@@ -174,7 +302,7 @@ export default function MessagePage({ params }: PageProps) {
             )}
             <div className="h-4" />
           </div>
-          <div className="sticky bottom-0 z-20 border-t border-white/10 bg-gray-900/95 px-4 py-4 backdrop-blur sm:px-6">
+          <div className="sticky bottom-10 md:bottom-0 z-20 border-t border-white/10 bg-gray-900/95 px-4 py-4 backdrop-blur sm:px-6">
             {selectedImage && (
               <div className="mb-3 flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 p-3">
                 <div className="flex items-center gap-3">
@@ -209,10 +337,14 @@ export default function MessagePage({ params }: PageProps) {
                   value={messageInput}
                   onChange={handleInputChange}
                   onKeyDown={(e) => {
-                    handleKeyDown(e);
                     handleUserStartedTyping();
                     if (e.key === "Enter" && !e.shiftKey) {
-                      void handleUserStoppedTyping();
+                      e.preventDefault();
+                      if (canSend) {
+                        void handleSendMessageWithPending();
+                      } else {
+                        void handleUserStoppedTyping();
+                      }
                     }
                   }}
                   onBlur={() => {
@@ -278,9 +410,7 @@ export default function MessagePage({ params }: PageProps) {
               <Button
                 type="button"
                 onClick={() => {
-                  void handleSendMessage().finally(() => {
-                    void handleUserStoppedTyping();
-                  });
+                  void handleSendMessageWithPending();
                 }}
                 disabled={!canSend}
                 size="icon"

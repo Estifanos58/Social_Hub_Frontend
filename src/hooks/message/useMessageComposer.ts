@@ -30,7 +30,7 @@ interface UseMessageComposerResult {
   messageInput: string;
   handleInputChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
   handleKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
-  handleSendMessage: () => Promise<void>;
+  handleSendMessage: () => Promise<boolean>;
   handleEmojiSelect: (emoji: unknown) => void;
   toggleEmojiPicker: () => void;
   closeEmojiPicker: () => void;
@@ -104,7 +104,7 @@ export const useMessageComposer = ({
 
   const handleSendMessage = useCallback(async () => {
     if (!trimmedMessage && !selectedImage) {
-      return;
+      return false;
     }
 
     let imageUrl: string | null = null;
@@ -147,9 +147,11 @@ export const useMessageComposer = ({
       }
 
       resetInputState();
+      return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to send message';
       notifyError(message);
+      return false;
     }
   }, [
     chatroomId,
