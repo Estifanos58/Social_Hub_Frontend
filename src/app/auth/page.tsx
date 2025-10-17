@@ -152,9 +152,9 @@ export default function AuthPage() {
       </div>
 
       {/* Social Logins */}
-      <div className="mt-4 flex gap-3  space-y-3 w-full">
-        <GoogleOAuth />
-        <GitHubOAuth/>
+      <div className="mt-4 flex gap-7 justify-center   space-y-3 w-full">
+          <GoogleOAuth />
+          <GitHubOAuth />
       </div>
     </div>
   );

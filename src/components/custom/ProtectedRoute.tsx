@@ -88,9 +88,26 @@ export default function ProtectedRoute({ children }: Props) {
   );
 
   const redirectToAuth = useCallback(() => {
-    const search = searchParams?.toString();
-    const redirectTo = `${pathname}${search ? `?${search}` : ""}`;
-    router.replace(`/auth?redirectTo=${encodeURIComponent(redirectTo)}`);
+    const redirectParam = searchParams?.get("redirectTo") ?? undefined;
+    const fallback = `${pathname}${(() => {
+      const search = searchParams?.toString();
+      if (!search) {
+        return "";
+      }
+      const cleaned = new URLSearchParams(search);
+      cleaned.delete("redirectTo");
+      const remaining = cleaned.toString();
+      return remaining ? `?${remaining}` : "";
+    })()}`;
+
+    const target = redirectParam ? decodeURIComponent(redirectParam) : fallback;
+
+    if (!target || target.startsWith("/auth")) {
+      router.replace("/auth");
+      return;
+    }
+
+    router.replace(`/auth?redirectTo=${encodeURIComponent(target)}`);
   }, [pathname, router, searchParams]);
 
   const [

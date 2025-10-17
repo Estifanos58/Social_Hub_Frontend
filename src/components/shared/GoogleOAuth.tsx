@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
-import { Button } from "../ui/button";
 
 function GoogleOAuth() {
   const handleGoogleOAuth = () => {
@@ -9,13 +8,17 @@ function GoogleOAuth() {
   };
 
   return (
-    <Button
+    <button
+      type="button"
       onClick={handleGoogleOAuth}
-      variant="outline"
-      className="flex-1 "
+      className="flex w-full h-15 items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:border-cyan-400/60 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
     >
-      <FcGoogle size={22} />
-    </Button>
+      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm">
+        <FcGoogle size={22} />
+      </span>
+      <span className="hidden sm:inline">Google</span>
+      <span className="sm:hidden">Google</span>
+    </button>
   );
 }
 
