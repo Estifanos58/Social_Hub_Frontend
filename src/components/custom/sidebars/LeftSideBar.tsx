@@ -18,6 +18,7 @@ import { useQuery } from "@apollo/client/react";
 import { GET_UNREAD_NOTIFICATIONS_COUNT } from "@/graphql/queries/notification/getUnreadNotificationsCount";
 import MessagePopUp from "./popUps/MessagePopUp";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/userStore";
 
 export const LeftSideBar = () => {
   // Unread notifications count (poll every 20s)
@@ -36,6 +37,8 @@ export const LeftSideBar = () => {
     selectedPopUp,
     setSelectedPopUp
   } = useGeneralStore();
+
+  const { user: currentUser } = useUserStore();
 
   const Links = [
     { icon: <BiHomeAlt2 />, label: "Home", href: "/" },
@@ -77,7 +80,7 @@ export const LeftSideBar = () => {
         setSelectedPopUp("connections");  
       },
     },
-    { icon: <IoPersonCircle />, label: "Profile", href: "/profile" },
+    { icon: <IoPersonCircle />, label: "Profile", href: `/profile/${currentUser?.id}` },
   ];
 
   // Handle resize for mobile view

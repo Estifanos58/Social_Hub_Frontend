@@ -9,6 +9,8 @@ import { CommentSection } from "../custom/CommentSection";
 import { formatRelative } from "@/lib/utils";
 import { useGeneralStore } from "@/store/generalStore";
 import { ReactionBar } from "./ReactionBar";
+import Link from "next/link";
+
 
 export const PostDisplay = ({ post }: { post: Post }) => {
   // Custom larger arrows for the image slider
@@ -64,6 +66,7 @@ export const PostDisplay = ({ post }: { post: Post }) => {
   return (
     <div className="m-6 w-[600px] bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl text-gray-100">
       {/* Header */}
+      <Link href={`/profile/${post.createdBy.id}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <img
@@ -84,6 +87,7 @@ export const PostDisplay = ({ post }: { post: Post }) => {
             : formatRelative(post.createdAt)}
         </span>
       </div>
+      </Link>
 
       {/* Content */}
       <p className="mb-4 text-sm text-gray-200">{post.content}</p>

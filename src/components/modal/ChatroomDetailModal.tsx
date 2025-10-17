@@ -15,6 +15,7 @@ import { DEFAULT_AVATAR, ChatroomDetail, ChatroomMemberDetail } from "@/lib/type
 import type { ChatroomMeta } from "@/lib/types";
 import { SEARCH_USERS } from "@/graphql/queries/user/searchUsers";
 import { ADD_USERS_TO_CHATROOM } from "@/graphql/mutations/chatroom/addUsersToChatroom";
+import Link from "next/link";
 
 interface ChatroomDetailModalProps {
   open: boolean;
@@ -505,9 +506,10 @@ const GroupDetailSection = ({ detail, isLoading }: GroupSectionProps) => {
           </p>
         )}
         {detail.members && detail.members.length > 0 && (
-          <div className="space-y-3">
+          <div className="flex flex-col gap-2">
             {detail.members.map((member) => (
-              <div key={member.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
+              <Link href={`/profile/${member.userId}`} key={member.userId}>
+              <div  className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
                 <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/10">
                   <Image
                     src={member.avatarUrl || DEFAULT_AVATAR}
@@ -530,6 +532,7 @@ const GroupDetailSection = ({ detail, isLoading }: GroupSectionProps) => {
                   </span>
                 )}
               </div>
+              </Link>
             ))}
           </div>
         )}

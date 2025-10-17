@@ -5,15 +5,17 @@ import { useUserStore } from "@/store/userStore";
 import { GetUserProfileQuery } from "@/gql/graphql";
 import { useGeneralStore } from "@/store/generalStore";
 
-export const useProfilePage = () => {
+export const useProfilePage = (userId?: string) => {
   const { user: currentUser } = useUserStore();
   const { setSelectedPost } = useGeneralStore();
   const [hoveredPost, setHoveredPost] = useState<string | null>(null);
+  const effectiveUserId = userId ?? currentUser?.id;
   const { data, loading, error } = useQuery<GetUserProfileQuery>(
     GET_USER_PROFILE,
     {
-      variables: { userId: currentUser?.id },
+      variables: { userId: effectiveUserId },
       fetchPolicy: "cache-and-network",
+      skip: !effectiveUserId,
     }
   );
 
@@ -38,5 +40,6 @@ export const useProfilePage = () => {
     isPrivate,
     setIsPrivate,
     handleSelectPost,
+    currentUser,
   };
 };

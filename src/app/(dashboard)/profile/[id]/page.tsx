@@ -2,18 +2,18 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import {
-  Heart,
-  MessageCircle,
-  Edit,
-  Lock,
-  Globe,
-  Grid3X3,
-} from "lucide-react"
+import { Globe, Grid3X3, Heart, Lock, MessageCircle, Edit } from "lucide-react"
 import Link from "next/link"
-import { useProfilePage } from "../../../hooks/user/useProfilePage"
+import { useProfilePage } from "../../../../hooks/user/useProfilePage"
 
-export default function ProfilePage() {
+type ProfilePageProps = {
+  params: {
+    id: string
+  }
+}
+
+export default function ProfilePage({ params }: ProfilePageProps) {
+  const { id } = params
   const {
     loading,
     error,
@@ -23,9 +23,9 @@ export default function ProfilePage() {
     setHoveredPost,
     isPrivate,
     handleSelectPost,
-  } = useProfilePage()
+    currentUser
+  } = useProfilePage(id)
 
-  // 🔄 Loading
   if (loading) {
     return (
       <div className="min-h-screen flex-1 bg-gray-900 flex items-center justify-center text-gray-100">
@@ -34,7 +34,6 @@ export default function ProfilePage() {
     )
   }
 
-  // ❌ Error
   if (error) {
     return (
       <div className="min-h-screen flex-1 bg-gray-900 flex items-center justify-center text-red-400">
@@ -43,7 +42,6 @@ export default function ProfilePage() {
     )
   }
 
-  // 📝 No user
   if (!profile || !account) {
     return (
       <div className="min-h-screen flex-1 bg-gray-900 flex items-center justify-center text-gray-400">
@@ -55,9 +53,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-900 flex-1 overflow-y-scroll text-gray-100">
       <div className="max-w-4xl mx-auto p-4">
-        {/* Header */}
         <div className="flex items-start gap-8 mb-8">
-          {/* Avatar */}
           <div className="flex-shrink-0">
             <Avatar className="w-32 h-32 md:w-40 md:h-40">
               <AvatarImage
@@ -71,29 +67,29 @@ export default function ProfilePage() {
             </Avatar>
           </div>
 
-          {/* Info */}
           <div className="flex-1 space-y-4">
-            <div className="flex items-center gap-4 flex-wrap">
-              <h1 className="text-xl font-light text-gray-100">{account.email}</h1>
-              <Link href={"/profile/edit"}>
-              <Button
-                variant="secondary"
-                className="bg-gray-800 hover:bg-gray-700 text-gray-100 border border-gray-700"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit profile
-              </Button>
-              </Link>
-              
-              <Button
-                variant="secondary"
-                className="bg-gray-800 hover:bg-gray-700 text-gray-100 border border-gray-700"
-              >
-                View archive
-              </Button>
-            </div>
 
-            {/* Stats */}
+        <div className="space-y-1">
+              <h2 className="font-semibold text-xl">
+                {account.firstname} {account.lastname}
+              </h2>
+              <p className="text-gray-300">{account.bio}</p>
+        </div>
+            {currentUser && (id == currentUser.id) && <div className="flex items-center gap-4 flex-wrap">
+              <h1 className="text-sm font-light text-gray-100">{account.email}</h1>
+              <Link href={"/profile/edit"}>
+                <Button
+                  variant="secondary"
+                  className="bg-gray-800 hover:bg-gray-700 text-gray-100 border border-gray-700"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit profile
+                </Button>
+              </Link>
+            </div>
+            }
+            
+
             <div className="flex gap-8">
               <div className="text-center">
                 <span className="font-semibold">{profile.posts?.length}</span>
@@ -109,15 +105,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Name + Bio */}
-            <div className="space-y-1">
-              <h2 className="font-semibold">
-                {account.firstname} {account.lastname}
-              </h2>
-              <p className="text-gray-300">{account.bio}</p>
-            </div>
-
-            {/* Privacy Toggle */}
             <div className="flex items-center gap-2">
               {isPrivate ? (
                 <Lock className="w-3 h-3 text-gray-400" />
@@ -131,7 +118,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="border-t border-gray-800 mb-4">
           <div className="flex justify-center gap-16 pt-4">
             <button className="flex items-center gap-2 text-white border-t border-white -mt-4 pt-4">
@@ -141,7 +127,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Posts */}
         <div className="grid grid-cols-3 gap-1">
           {profile.posts?.map((post: any) => (
             <div
@@ -172,7 +157,6 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* Empty */}
         {profile.posts?.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-400">No posts yet</p>
