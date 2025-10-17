@@ -10,6 +10,7 @@ import { Plus } from "lucide-react";
 import Searching, { MessageSkeletonList } from "./Searching";
 import { useUserChatrooms } from "@/hooks/chatroom/useUserChatrooms";
 import { userMessageStore } from "@/store/messageStore";
+import { useGeneralStore } from "@/store/generalStore";
 import { formatRelative } from "@/lib/utils";
 import { ChatroomMeta, ChatroomListItem, DEFAULT_AVATAR } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
   const setSelectedChatRoomId = userMessageStore((state) => state.setSelectedChatRoomId);
   const setSelectedChatroomMeta = userMessageStore((state) => state.setSelectedChatroomMeta);
   const [isCreateGroupOpen, setCreateGroupOpen] = useState(false);
+  const { isMobile } = useGeneralStore();
 
   const toChatroomMeta = useCallback(
     (room: ChatroomListItem | undefined): ChatroomMeta | null => {
@@ -50,11 +52,16 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
       if (resolvedMeta) {
         setSelectedChatroomMeta(resolvedMeta);
       }
-      setShowPopup(true);
-      setIsCollapsed(true);
+      if (isMobile) {
+        setShowPopup(false);
+        setIsCollapsed(true);
+      } else {
+        setShowPopup(true);
+        setIsCollapsed(true);
+      }
       router.push(`/message/${routeId}`);
     },
-    [chatrooms, router, setIsCollapsed, setSelectedChatRoomId, setSelectedChatroomMeta, setShowPopup, toChatroomMeta],
+    [chatrooms, isMobile, router, setIsCollapsed, setSelectedChatRoomId, setSelectedChatroomMeta, setShowPopup, toChatroomMeta],
   );
 
   const handleGroupCreated = useCallback(

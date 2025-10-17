@@ -83,6 +83,17 @@ export const LeftSideBar = () => {
     { icon: <IoPersonCircle />, label: "Profile", href: `/profile/${currentUser?.id}` },
   ];
 
+  const handleMobileNavClick = (link: (typeof Links)[number]) => {
+    if (link.onClick) {
+      link.onClick();
+      return;
+    }
+
+    if (link.href) {
+      router.push(link.href);
+    }
+  };
+
   // Handle resize for mobile view
   useEffect(() => {
     const handleResize = () => {
@@ -107,10 +118,26 @@ export const LeftSideBar = () => {
 
   if (isMobile) {
     return (
-      <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 flex justify-around items-center py-2 z-50">
-        {Links.map((link) => (
-          <Link href={link.href || "#"} key={link.label}>
-            <div className="flex flex-col items-center text-gray-300 hover:text-amber-400 relative" aria-label={link.label}>
+      <>
+        {showPopup && (
+          <div className="fixed inset-0 z-[60] bg-gray-950/95 backdrop-blur-sm flex flex-col">
+            <div className="flex-1 overflow-y-auto">
+              {(selectedPopUp === "search") && <SearchPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed} />}
+              {(selectedPopUp === "connections") && <FollowersPopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed} />}
+              {(selectedPopUp === "notifications") && <NotificationsPopUp setIsCollapsed={setIsCollapsed} setShowPopup={setShowPopup} />}
+              {(selectedPopUp === "message") && <MessagePopUp setShowPopup={setShowPopup} setIsCollapsed={setIsCollapsed} />}
+            </div>
+          </div>
+        )}
+        <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 flex justify-around items-center py-2 z-50">
+          {Links.map((link) => (
+            <button
+              type="button"
+              key={link.label}
+              onClick={() => handleMobileNavClick(link)}
+              className="flex flex-col items-center text-gray-300 hover:text-amber-400 relative"
+              aria-label={link.label}
+            >
               <span className="text-2xl">
                 {link.label === "Notifications" ? (
                   <span className="relative">
@@ -124,10 +151,11 @@ export const LeftSideBar = () => {
                 ) : link.icon}
               </span>
               {/* Label intentionally hidden on mobile per requirement */}
-            </div>
-          </Link>
-        ))}
-      </div>
+            </button>
+          ))}
+          <CreatePost />
+        </div>
+      </>
     );
   }
 
