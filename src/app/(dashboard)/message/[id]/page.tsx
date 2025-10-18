@@ -313,11 +313,11 @@ export default function MessagePage({ params }: PageProps) {
                       className="h-full w-full object-cover"
                     />
                   </div>
-                  <div className="text-sm text-white/70">
+                  {/* <div className="text-sm text-white/70">
                     {isUploading && uploadProgress !== null
                       ? `Uploading… ${uploadProgress}%`
                       : "Ready to send"}
-                  </div>
+                  </div> */}
                 </div>
                 <Button
                   variant="ghost"

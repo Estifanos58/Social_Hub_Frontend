@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { DEFAULT_AVATAR, MessageEdge } from "@/lib/types";
-import { Button } from "@/components/ui/button";
 import { Info } from "lucide-react";
 import { formatEditedTime, formatTime } from "@/lib/utils";
 import clsx from "clsx";
 import Image from "next/image";
+import { MessageImageModal } from "@/components/modal/MessageImageModal";
+import { Button } from "../ui/button";
 
 export const Avatar = ({ src, alt }: { src?: string | null; alt: string }) => (
   <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/10">
@@ -18,10 +20,11 @@ export const Avatar = ({ src, alt }: { src?: string | null; alt: string }) => (
 );
 
 export const MessageBubble = ({ message, isOwn }: { message: MessageEdge; isOwn: boolean }) => {
+  const [isImageOpen, setImageOpen] = useState(false);
   const editedLabel = formatEditedTime(message.createdAt, message.updatedAt);
   const bubble = (
     <div
-      className={clsx('max-w-lg rounded-2xl border border-white/10 p-4 shadow-lg backdrop-blur', {
+      className={clsx('md:w-[300px] lg:w-[400px] max-w-4xl rounded-2xl border border-white/10 p-4 shadow-lg backdrop-blur md:max-w-3xl', {
         'bg-emerald-500/10': isOwn,
         'bg-white/5': !isOwn,
       })}
@@ -36,18 +39,30 @@ export const MessageBubble = ({ message, isOwn }: { message: MessageEdge; isOwn:
         <p className="mt-2 whitespace-pre-wrap text-sm text-white/90">{message.content}</p>
       )}
       {message.imageUrl && (
-        <div
-          className="relative mt-3 w-full overflow-hidden rounded-lg border border-white/10"
-          style={{ minHeight: 200 }}
-        >
-          <Image
-            src={message.imageUrl}
-            alt="message attachment"
-            fill
-            sizes="(max-width: 768px) 100vw, 600px"
-            className="object-cover"
+        <>
+          <button
+            type="button"
+            onClick={() => setImageOpen(true)}
+            className="group relative mt-3 block w-full overflow-hidden rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-400/70"
+          >
+            <span className="relative block min-h-[220px] md:min-h-[420px]">
+              <Image
+                src={message.imageUrl}
+                alt="message attachment"
+                fill
+                sizes="(max-width: 768px) 100vw, 900px"
+                className="object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+              />
+            </span>
+          </button>
+          <MessageImageModal
+            open={isImageOpen}
+            onOpenChange={setImageOpen}
+            imageUrl={message.imageUrl}
+            senderName={message.user?.firstname}
+            messageId={message.id}
           />
-        </div>
+        </>
       )}
       {editedLabel && <p className="mt-3 text-xs italic text-white/60">{editedLabel}</p>}
     </div>
@@ -56,15 +71,18 @@ export const MessageBubble = ({ message, isOwn }: { message: MessageEdge; isOwn:
   return (
     <div
       className={clsx('flex items-start gap-3', {
-        'justify-start': isOwn,
-        'justify-end': !isOwn,
+        'flex-row-reverse': isOwn,
+        'flex-row': !isOwn,
       })}
     >
-      {isOwn && <Avatar src={message.user?.avatarUrl} alt={`${message.user?.firstname ?? 'User'} avatar`} />}
-      {bubble}
-      {!isOwn && (
-        <Avatar src={message.user?.avatarUrl} alt={`${message.user?.firstname ?? 'User'} avatar`} />
-      )}
+      <Avatar src={message.user?.avatarUrl} alt={`${message.user?.firstname ?? 'User'} avatar`} />
+      <div className={clsx('flex flex-1', {
+        'justify-end': isOwn,
+        'justify-start': !isOwn,
+      })}
+      >
+        {bubble}
+      </div>
     </div>
   );
 };
