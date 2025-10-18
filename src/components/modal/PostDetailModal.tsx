@@ -100,13 +100,6 @@ export function PostDetailModal({
                   {createdBy?.lastname?.toLowerCase?.() ?? ""}
                 </span>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white hover:bg-gray-800"
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </Button>
             </div>
 
             {/* Comments section */}
