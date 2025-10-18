@@ -18,7 +18,7 @@ import { useGeneralStore } from "@/store/generalStore"
 import { useCreatePost } from "@/hooks/post/useCreatePost"
 
 function CreatePost() {
-  const { isCollapsed } = useGeneralStore()
+  const { isCollapsed, isMobile } = useGeneralStore()
   const {
     images,
     content,
@@ -45,15 +45,18 @@ function CreatePost() {
         <Button
           variant="outline"
           className="bg-gray-900 border-gray-700 text-white hover:bg-gray-800"
+          aria-label="Create post"
         >
           <Plus className="w-4 h-4" />
           {isCollapsed ? "" : "Create Post"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] bg-gray-900 border-gray-700 text-white">
-        <DialogHeader>
-          <DialogTitle className="text-white">Create New Post</DialogTitle>
-        </DialogHeader>
+        {!isMobile && (
+          <DialogHeader>
+            <DialogTitle className="text-white">Create New Post</DialogTitle>
+          </DialogHeader>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">

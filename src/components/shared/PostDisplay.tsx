@@ -10,6 +10,7 @@ import { formatRelative } from "@/lib/utils";
 import { useGeneralStore } from "@/store/generalStore";
 import { ReactionBar } from "./ReactionBar";
 import Link from "next/link";
+import Image from "next/image";
 
 
 export const PostDisplay = ({ post }: { post: Post }) => {
@@ -25,7 +26,7 @@ export const PostDisplay = ({ post }: { post: Post }) => {
       type="button"
       aria-label={direction === 'left' ? 'Previous image' : 'Next image'}
       onClick={onClick}
-      className={`!flex !items-center !justify-center !w-12 !h-12 !bg-black/50 hover:!bg-black/70 !backdrop-blur !rounded-full !z-20 !text-white !transition !duration-200 !border !border-white/20 !absolute top-1/2 -translate-y-1/2 ${direction === 'left' ? '!left-2' : '!right-2'}`}
+      className={`hidden md:!flex !items-center !justify-center !w-12 !h-12 !bg-black/50 hover:!bg-black/70 !backdrop-blur !rounded-full !z-20 !text-white !transition !duration-200 !border !border-white/20 !absolute top-1/2 -translate-y-1/2 ${direction === 'left' ? '!left-2' : '!right-2'}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -59,12 +60,21 @@ export const PostDisplay = ({ post }: { post: Post }) => {
     arrows: true,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
+    adaptiveHeight: true,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          arrows: false,
+        },
+      },
+    ],
   };
 
   const {setSelectedPost} = useGeneralStore();
 
   return (
-    <div className="m-6 w-[600px] bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl text-gray-100">
+  <div className="w-svw bg-gray-900 border border-gray-800 rounded-none p-4 shadow-xl text-gray-100 mb-6 md:mx-6 md:mt-6 md:w-[600px] md:rounded-xl md:p-5">
       {/* Header */}
       <Link href={`/profile/${post.createdBy.id}`}>
       <div className="flex items-center justify-between mb-4">
@@ -94,14 +104,17 @@ export const PostDisplay = ({ post }: { post: Post }) => {
 
       {/* Images */}
       {post.images.length > 0 && (
-        <div className="mb-4 relative group">
-          <Slider {...sliderSettings}>
+        <div className="mb-4 overflow-hidden rounded-lg border border-gray-800">
+          <Slider {...sliderSettings} className="w-full">
             {post.images.map((img: any) => (
-              <div key={img.id} className="px-1">
-                <img
+              <div key={img.id} className="px-0 md:px-1">
+                <Image
                   src={img.url}
                   alt="post"
-                  className="w-full h-[350px] object-cover rounded-lg border border-gray-800"
+                  className="w-full h-48 object-cover md:h-[350px]"
+                  width={600}
+                  height={350}
+                  sizes="(max-width: 768px) 100vw, 600px"
                 />
               </div>
             ))}

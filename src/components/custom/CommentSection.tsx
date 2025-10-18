@@ -54,7 +54,7 @@ export const CommentSection = ({
     <div className={
       (compact
         ? "mt-2 rounded-lg border border-gray-800 bg-gray-900 p-3"
-        : "mt-4 rounded-xl border border-gray-800 bg-gray-900 p-4") +
+        : "mt-4 rounded-xl border border-gray-800 bg-gray-900 p-3 md:p-4") +
       " text-gray-200 shadow-inner shadow-black/30 transition-colors"
     }>
       <div className="relative">
@@ -70,7 +70,7 @@ export const CommentSection = ({
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               autoFocus={autoFocus}
-              className={(compact ? "min-h-[40px] text-sm" : "min-h-[48px] text-2xl") + " max-h-[140px] leading-relaxed resize-none pr-12 bg-gray-900 border border-gray-700 hover:border-gray-500 focus:border-amber-400/70 focus:ring-2 focus:ring-amber-400/30 placeholder:text-gray-500 rounded-lg shadow-sm focus:shadow-md transition-all duration-200 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-700 hover:scrollbar-thumb-gray-600"}
+              className={(compact ? "min-h-[40px] text-sm" : "min-h-[48px] text-base md:text-lg") + "max-h-[140px] leading-relaxed resize-none pr-12 bg-gray-900 border border-gray-700 hover:border-gray-500 focus:border-amber-400/70 focus:ring-2 focus:ring-amber-400/30 placeholder:text-gray-500 rounded-lg shadow-sm focus:shadow-md transition-all duration-200 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-700 hover:scrollbar-thumb-gray-600"}
               rows={2}
               style={{ overflowY: "auto" }}
             />
@@ -126,14 +126,14 @@ export const CommentSection = ({
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className={(compact ? "bg-gray-900 h-9 px-3 text-xs" : "bg-gray-900 h-full px-5 text-sm") + " hover:bg-gray-800 text-white shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all border border-gray-700"}
+              className={(compact ? "bg-gray-900 h-9 px-3 text-xs" : "bg-gray-900 h-10 px-4 text-xs md:h-full md:px-5 md:text-sm") + " hover:bg-gray-800 text-white shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all border border-gray-700"}
             >
               {isSubmitting ? "Posting..." : "Post"}
             </Button>
           )}
         </div>
         {comment.trim() && !compact && (
-          <div className="text-xs text-gray-400 mt-2 pl-0.5 select-none">
+          <div className="text-[10px] md:text-xs text-gray-400 mt-2 pl-0.5 select-none">
             Press Cmd+Enter (Mac) or Ctrl+Enter (Windows) to post
           </div>
         )}

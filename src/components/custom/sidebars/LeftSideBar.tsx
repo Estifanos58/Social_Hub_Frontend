@@ -70,7 +70,7 @@ export const LeftSideBar = () => {
         setSelectedPopUp("message")
       }
       },
-    { icon: <IoMdTrendingUp />, label: "Trending" },
+    // { icon: <IoMdTrendingUp />, label: "Trending" },
     {
       icon: <RiUserFollowLine />,
       label: "Connections",
@@ -93,6 +93,18 @@ export const LeftSideBar = () => {
       router.push(link.href);
     }
   };
+
+  const renderMobileButton = (link: (typeof Links)[number]) => (
+    <button
+      type="button"
+      key={link.label}
+      onClick={() => handleMobileNavClick(link)}
+      className="flex flex-col items-center text-gray-300 hover:text-amber-400"
+      aria-label={link.label}
+    >
+      <span className="text-2xl">{link.icon}</span>
+    </button>
+  );
 
   // Handle resize for mobile view
   useEffect(() => {
@@ -117,6 +129,10 @@ export const LeftSideBar = () => {
   }, []);
 
   if (isMobile) {
+    const midIndex = Math.ceil(Links.length / 2);
+    const firstLinks = Links.slice(0, midIndex);
+    const secondLinks = Links.slice(midIndex);
+
     return (
       <>
         {showPopup && (
@@ -129,31 +145,16 @@ export const LeftSideBar = () => {
             </div>
           </div>
         )}
-        <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 flex justify-around items-center py-2 z-50">
-          {Links.map((link) => (
-            <button
-              type="button"
-              key={link.label}
-              onClick={() => handleMobileNavClick(link)}
-              className="flex flex-col items-center text-gray-300 hover:text-amber-400 relative"
-              aria-label={link.label}
-            >
-              <span className="text-2xl">
-                {link.label === "Notifications" ? (
-                  <span className="relative">
-                    <IoMdNotificationsOutline />
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center font-bold border-2 border-gray-900">
-                        {unreadCount > 99 ? "99+" : unreadCount}
-                      </span>
-                    )}
-                  </span>
-                ) : link.icon}
-              </span>
-              {/* Label intentionally hidden on mobile per requirement */}
-            </button>
-          ))}
-          <CreatePost />
+        <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 flex items-center gap-6 px-4 py-2 z-50">
+          <div className="flex flex-1 justify-evenly">
+            {firstLinks.map(renderMobileButton)}
+          </div>
+          <div className="flex-shrink-0">
+            <CreatePost />
+          </div>
+          <div className="flex flex-1 justify-evenly">
+            {secondLinks.map(renderMobileButton)}
+          </div>
         </div>
       </>
     );
