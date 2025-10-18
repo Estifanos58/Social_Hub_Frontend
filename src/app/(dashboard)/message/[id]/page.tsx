@@ -16,7 +16,7 @@ import {
 } from "@/components/shared/skeleton/MessagePageSkeleton";
 import { useMessageComposer } from "@/hooks/message/useMessageComposer";
 import { useMessagesBetweenUsers } from "@/hooks/message/useMessagesBetweenUsers";
-import { Avatar, ChatHeader, MessageBubble } from "@/components/custom/MessagePageCommponents";
+import { Avatar, ChatHeader, MessageBubble } from "@/components/custom/message/MessagePageCommponents";
 import { useTypping } from "@/hooks/message/useTypping";
 import { ChatroomDetailModal } from "@/components/modal/ChatroomDetailModal";
 import { userMessageStore } from "@/store/messageStore";

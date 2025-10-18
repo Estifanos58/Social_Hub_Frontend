@@ -3,8 +3,8 @@
 import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import LoginForm from "@/components/custom/LoginForm";
-import SignUpForm from "@/components/custom/SignUpForm";
+import LoginForm from "@/components/custom/auth/LoginForm";
+import SignUpForm from "@/components/custom/auth/SignUpForm";
 import GoogleOAuth from "@/components/shared/GoogleOAuth";
 import GitHubOAuth from "@/components/shared/GitHubOAuth";
 import { useAuthForm } from "@/hooks/auth/useAuthForm";

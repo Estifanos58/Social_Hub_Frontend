@@ -1,5 +1,5 @@
 import React from "react";
-import { AuthShowcase } from "@/components/custom/AuthShowcase";
+import { AuthShowcase } from "@/components/custom/auth/AuthShowcase";
 
 export default function AuthLayout({
   children,

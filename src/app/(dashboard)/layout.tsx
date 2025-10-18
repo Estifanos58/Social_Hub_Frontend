@@ -1,4 +1,4 @@
-import { MessageContainer } from "@/components/custom/MessageContainer";
+import { MessageContainer } from "@/components/custom/message/MessageContainer";
 import { LeftSideBar } from "@/components/custom/sidebars/LeftSideBar";
 import Modal from "@/components/shared/Modal";
 

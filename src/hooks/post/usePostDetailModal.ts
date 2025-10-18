@@ -1,11 +1,12 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@apollo/client/react";
 import { GET_POST } from "@/graphql/queries/post/GetPost";
 import { SelectedPost } from "@/store/generalStore";
 import { usePostComments } from "@/hooks/post/usePostComments";
 import { formatRelative } from "@/lib/utils";
-import { CommentNode } from "../../components/custom/CommentItem";
+import { CommentNode } from "../../components/custom/comment/CommentItem";
 import { toast } from "sonner";
+import { CreatedComment } from "@/hooks/comment/useCommentSection";
 
 interface DetailedSelectedPost extends SelectedPost {
   reactionsCount?: number | null;
@@ -229,27 +230,94 @@ export const usePostDetailModal = (post: SelectedPost | null) => {
     return normalizedInitialComments;
   }, [liveComments, normalizedInitialComments]);
 
+  const [localComments, setLocalComments] = useState<CommentNode[]>([]);
   const [localReplies, setLocalReplies] = useState<Record<string, CommentNode[]>>({});
 
-  const handleReplyAdded = (parentId: string, reply: CommentNode) => {
-    setLocalReplies((prev) => ({
-      ...prev,
-      [parentId]: prev[parentId] ? [...prev[parentId], reply] : [reply],
-    }));
-    toast.success("Reply added");
-  };
+  useEffect(() => {
+    setLocalComments([]);
+    setLocalReplies({});
+  }, [postId]);
+
+  const toCommentNode = useCallback(
+    (created: CreatedComment): CommentNode => ({
+      id: created.id,
+      content: created.content,
+      createdAt: created.createdAt,
+      updatedAt: created.createdAt,
+      parentId: created.parentId ?? null,
+      replyCount: created.replyCount ?? 0,
+      createdBy: {
+        id: created.createdBy?.id ?? "",
+        firstname: created.createdBy?.firstname ?? "",
+        lastname: created.createdBy?.lastname ?? "",
+        avatarUrl: created.createdBy?.avatarUrl,
+      },
+      replies: [],
+    }),
+    [],
+  );
+
+  const handleCommentAdded = useCallback(
+    (created: CreatedComment) => {
+      const normalized = toCommentNode(created);
+      setLocalComments((prev) => {
+        const filtered = prev.filter((comment) => comment.id !== normalized.id);
+        return sortCommentTree([...filtered, normalized]);
+      });
+    },
+    [toCommentNode],
+  );
+
+  const handleReplyAdded = useCallback(
+    (parentId: string, reply: CreatedComment) => {
+      const normalized = toCommentNode(reply);
+      setLocalReplies((prev) => {
+        const existing = prev[parentId] ?? [];
+        const filtered = existing.filter((item) => item.id !== normalized.id);
+        return {
+          ...prev,
+          [parentId]: [...filtered, normalized],
+        };
+      });
+      toast.success("Reply added");
+    },
+    [toCommentNode],
+  );
+
+  const combinedComments = useMemo(() => {
+    if (!localComments.length) {
+      return mergedComments;
+    }
+    const map = new Map<string, CommentNode>();
+    mergedComments.forEach((comment) => {
+      map.set(comment.id, comment);
+    });
+    localComments.forEach((comment) => {
+      map.set(comment.id, comment);
+    });
+    return sortCommentTree(Array.from(map.values()));
+  }, [mergedComments, localComments]);
 
   const commentsWithLocalReplies = useMemo(() => {
-    return mergedComments.map((c) => {
-      const extra = localReplies[c.id] || [];
-      if (!extra.length) return c;
-      return { ...c, replies: [...(c.replies || []), ...extra] };
+    return combinedComments.map((comment) => {
+      const extras = localReplies[comment.id] ?? [];
+      if (!extras.length) {
+        return comment;
+      }
+      const existing = Array.isArray(comment.replies) ? comment.replies : [];
+      const map = new Map<string, CommentNode>();
+      existing.forEach((reply) => map.set(reply.id, reply));
+      extras.forEach((reply) => map.set(reply.id, reply));
+      return {
+        ...comment,
+        replies: sortCommentTree(Array.from(map.values())),
+      };
     });
-  }, [mergedComments, localReplies]);
+  }, [combinedComments, localReplies]);
 
   const showCommentsSkeleton =
     (commentsLoading || (shouldFetchPost && postDetailsLoading)) &&
-    mergedComments.length === 0;
+    combinedComments.length === 0;
 
   return {
     resolvedPost,
@@ -261,6 +329,7 @@ export const usePostDetailModal = (post: SelectedPost | null) => {
     commentsLoading,
     hasNextPage,
     loadMore,
+    handleCommentAdded,
     handleReplyAdded,
     postId,
     showCommentsSkeleton,

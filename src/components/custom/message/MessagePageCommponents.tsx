@@ -5,7 +5,7 @@ import { formatEditedTime, formatTime } from "@/lib/utils";
 import clsx from "clsx";
 import Image from "next/image";
 import { MessageImageModal } from "@/components/modal/MessageImageModal";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 
 export const Avatar = ({ src, alt }: { src?: string | null; alt: string }) => (
   <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/10">

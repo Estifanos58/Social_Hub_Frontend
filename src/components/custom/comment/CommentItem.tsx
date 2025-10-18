@@ -5,6 +5,7 @@ import { formatRelative } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CommentSection } from "./CommentSection";
 import { CollapsibleReplies } from "./CollapsibleReplies";
+import { CreatedComment } from "@/hooks/comment/useCommentSection";
 
 export interface CommentNode {
   id: string;
@@ -26,7 +27,7 @@ interface CommentItemProps {
   comment: CommentNode;
   postId: string;
   depth?: number;
-  onReplyAdded?: (parentId: string, reply: CommentNode) => void;
+  onReplyAdded?: (parentId: string, reply: CreatedComment) => void;
   maxDepth?: number;
 }
 
@@ -79,8 +80,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
               compact
               autoFocus
               placeholder="Reply..."
-              onCreated={(created: any) => {
-                if (onReplyAdded) onReplyAdded(comment?.id, created as any);
+              onCreated={(created) => {
+                onReplyAdded?.(comment?.id, created);
                 setShowReply(false);
               }}
             />

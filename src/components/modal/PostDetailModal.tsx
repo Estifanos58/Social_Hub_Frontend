@@ -13,8 +13,8 @@ import React from "react";
 import { CommentSkeletonList } from "../shared/skeleton/CommentSkeleton";
 
 import { usePostDetailModal, sliderSettings } from "../../hooks/post/usePostDetailModal";
-import { CommentItem } from "../custom/CommentItem";
-import { CommentSection } from "../custom/CommentSection";
+import { CommentItem } from "../custom/comment/CommentItem";
+import { CommentSection } from "../custom/comment/CommentSection";
 
 interface PostDetailModalProps {
   isOpen: boolean;
@@ -36,6 +36,7 @@ export function PostDetailModal({
     commentsWithLocalReplies,
     hasNextPage,
     loadMore,
+    handleCommentAdded,
     handleReplyAdded,
     postId,
     showCommentsSkeleton,
@@ -176,7 +177,7 @@ export function PostDetailModal({
               <div className="text-gray-400 text-xs">
                 {createdAtLabel}
               </div>
-              <CommentSection postId={postId!} />
+              <CommentSection postId={postId!} onCreated={handleCommentAdded} />
             </div>
           </div>
         </div>

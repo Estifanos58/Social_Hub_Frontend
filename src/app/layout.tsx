@@ -5,7 +5,7 @@ import "./globals.css";
 import { ApolloProvider } from "@apollo/client/react";
 import { client } from "../../apolloClient";
 import { Toaster } from "@/components/ui/sonner";
-import ProtectedRoute from "@/components/custom/ProtectedRoute";
+import ProtectedRoute from "@/components/custom/auth/ProtectedRoute";
 import { Suspense } from "react";
 
 const geistSans = Geist({

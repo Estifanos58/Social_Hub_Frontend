@@ -1,13 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import { CommentNode, CommentItem } from "./CommentItem";
+import { CreatedComment } from "@/hooks/comment/useCommentSection";
 
 interface CollapsibleRepliesProps {
   comment: CommentNode;
   postId: string;
   depth: number;
   maxDepth?: number;
-  onReplyAdded?: (parentId: string, reply: CommentNode) => void;
+  onReplyAdded?: (parentId: string, reply: CreatedComment) => void;
 }
 
 export const CollapsibleReplies: React.FC<CollapsibleRepliesProps> = ({ comment, postId, depth, maxDepth = 2, onReplyAdded }) => {

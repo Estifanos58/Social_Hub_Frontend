@@ -5,7 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Post } from "@/lib/types";
 import React from "react";
-import { CommentSection } from "../custom/CommentSection";
+import { CommentSection } from "../custom/comment/CommentSection";
 import { formatRelative } from "@/lib/utils";
 import { useGeneralStore } from "@/store/generalStore";
 import { ReactionBar } from "./ReactionBar";

@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import InputField from "../shared/InputField";
+import InputField from "../../shared/InputField";
 
 interface SignUpFormProps {
   formData: any;

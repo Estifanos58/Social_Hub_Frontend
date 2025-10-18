@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useGeneralStore } from "@/store/generalStore";
 import { IoPersonCircle} from "react-icons/io5";
 import { SidebarItem } from "../SidebarItem";
-import CreatePost from "../CreatePost";
+import CreatePost from "../post/CreatePost";
 import SearchPopUp from "./popUps/SearchPopUp";
 import FollowersPopUp from "./popUps/FollowersPopUp";
 import NotificationsPopUp from "./popUps/NotificationsPopUp";

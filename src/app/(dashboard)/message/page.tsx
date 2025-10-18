@@ -1,6 +1,6 @@
 'use client'
 
-import { MessageContainer } from '@/components/custom/MessageContainer'
+import { MessageContainer } from '@/components/custom/message/MessageContainer'
 import { useGeneralStore } from '@/store/generalStore'
 import React, { useEffect } from 'react'
 

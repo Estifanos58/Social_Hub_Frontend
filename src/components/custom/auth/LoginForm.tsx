@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import InputField from "../shared/InputField";
+import InputField from "../../shared/InputField";
 import { useRouter } from "next/navigation";
 
 interface LoginFormProps {

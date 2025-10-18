@@ -11,6 +11,7 @@ export interface CreatedComment {
   content: string;
   postId: string;
   createdAt: string;
+  replyCount?: number | null;
   parentId?: string | null;
   createdBy?: {
     id: string;
@@ -104,10 +105,10 @@ export const useCommentSection = ({
       if (created) {
         const actor = user
           ? {
-              id: user.id,
-              firstname: user.firstname,
-              lastname: user.lastname,
-              avatarUrl: user.avatarUrl ?? "",
+              id: user?.id,
+              firstname: user?.firstname,
+              lastname: user?.lastname,
+              avatarUrl: user?.avatarUrl ?? "",
             }
           : {
               id: created.createdBy?.id ?? "",
