@@ -380,7 +380,8 @@ export default function MessagePage({ params }: PageProps) {
                     </Button>
                     {showEmojiPicker && (
                       <div
-                        className="absolute bottom-full right-0 z-50 mb-3 w-72 rounded-2xl border border-white/10 bg-zinc-900/95 p-3 shadow-2xl backdrop-blur"
+                        className="absolute bottom-full right-0 z-50 mb-3 w-64 max-w-xs overflow-y-auto rounded-2xl border border-white/10 bg-zinc-900/95 p-3 shadow-2xl backdrop-blur sm:w-72"
+                        style={{ maxHeight: "60vh" }}
                         data-theme="dark"
                       >
                         <EmojiPicker

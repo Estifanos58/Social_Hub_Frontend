@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { GET_USERS_TO_FOLLOW } from "@/graphql/queries/user/getUsersToFollow";
 import { useQuery } from "@apollo/client/react";
 import { GetUsersToFollowQuery } from "@/gql/graphql";
@@ -30,8 +31,7 @@ function RightSideBar() {
 
   return (
     <div className="hidden md:flex w-[350px] border-l border-gray-800 bg-gray-900 flex-col justify-between p-4">
-      {/* Suggested Section */}
-      {/* User Profile Section */}
+      <Link href={`/profile/${user?.id}`}>
       <div className="flex items-center mb-6 space-x-3 bg-gray-800/60 rounded-xl px-4 py-2 cursor-pointer hover:bg-gray-700/70 transition">
         <Image
           src={user?.avatarUrl ? user.avatarUrl : "/noAvatar.png"}
@@ -47,6 +47,7 @@ function RightSideBar() {
           <span className="text-xs text-gray-400">View profile</span>
         </div>
       </div>
+      </Link>
 
       <div>
         <div className="flex items-center justify-between mb-4">
