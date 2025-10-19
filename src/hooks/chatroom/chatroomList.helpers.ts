@@ -8,6 +8,7 @@ export interface ChatroomMemberEdge {
     firstname: string;
     lastname?: string | null;
     avatarUrl?: string | null;
+    lastSeenAt?: string | null;
   } | null;
 }
 
@@ -98,6 +99,8 @@ export const buildChatroomListItem = (
     routeId,
     lastMessage,
     lastActivityAt,
+    otherUserId: isGroup ? null : otherMember?.id ?? null,
+    otherUserLastSeenAt: isGroup ? null : otherMember?.lastSeenAt ?? null,
   };
 };
 

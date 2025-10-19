@@ -46,6 +46,7 @@ export type MessageEdge = {
     firstname: string;
     lastname?: string | null;
     avatarUrl?: string | null;
+    lastSeenAt?: string | null;
   };
   chatroom?: {
     id: string;
@@ -60,6 +61,7 @@ export type MessageEdge = {
         firstname: string;
         lastname?: string | null;
         avatarUrl?: string | null;
+        lastSeenAt?: string | null;
       } | null;
     }>;
   } | null;
@@ -88,6 +90,8 @@ export interface ChatroomListItem {
   routeId: string;
   lastMessage: ChatroomLastMessage | null;
   lastActivityAt: string;
+  otherUserId?: string | null;
+  otherUserLastSeenAt?: string | null;
 }
 
 export const DEFAULT_AVATAR = '/noAvatar.png';
@@ -98,6 +102,10 @@ export interface ChatroomMeta {
   name: string;
   avatarUrl?: string | null;
   subtitle?: string | null;
+  otherUserId?: string | null;
+  otherUserLastSeenAt?: string | null;
+  isOnline?: boolean;
+  lastSeenAt?: string | null;
 }
 
 export interface ChatroomMemberDetail {

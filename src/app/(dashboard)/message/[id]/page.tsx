@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { Smile, Image as ImageIcon, Send, X, Loader2 } from "lucide-react";
 import { EmojiPicker } from "@ferrucc-io/emoji-picker";
@@ -21,6 +21,7 @@ import { useTypping } from "@/hooks/message/useTypping";
 import { ChatroomDetailModal } from "@/components/modal/ChatroomDetailModal";
 import { userMessageStore } from "@/store/messageStore";
 import type { MessageEdge } from "@/lib/types";
+import { useUserPresence } from "@/hooks/message/useUserPresence";
 
 interface PageProps {
   params: Promise<{
@@ -125,6 +126,44 @@ export default function MessagePage({ params }: PageProps) {
 
   const activeChatroomMeta = chatroomMeta?.id ? chatroomMeta : selectedChatroomMeta ?? chatroomMeta;
   const isGroupChat = activeChatroomMeta?.isGroup ?? false;
+  const directUserId = !isGroupChat ? activeChatroomMeta?.otherUserId ?? id : null;
+
+  const presenceMap = useUserPresence({
+    userIds: directUserId ? [directUserId] : [],
+    initialLastSeen:
+      directUserId && (activeChatroomMeta?.lastSeenAt ?? activeChatroomMeta?.otherUserLastSeenAt)
+        ? {
+            [directUserId]:
+              activeChatroomMeta?.lastSeenAt ?? activeChatroomMeta?.otherUserLastSeenAt ?? null,
+          }
+        : {},
+  });
+
+  const otherUserPresence = directUserId ? presenceMap[directUserId] : undefined;
+
+  const headerMeta = useMemo(() => {
+    if (!activeChatroomMeta) {
+      return activeChatroomMeta;
+    }
+
+    if (isGroupChat) {
+      return {
+        ...activeChatroomMeta,
+        isOnline: undefined,
+        lastSeenAt: activeChatroomMeta.lastSeenAt ?? null,
+      };
+    }
+
+    return {
+      ...activeChatroomMeta,
+      isOnline: otherUserPresence?.isOnline ?? false,
+      lastSeenAt:
+        otherUserPresence?.lastSeenAt ??
+        activeChatroomMeta.lastSeenAt ??
+        activeChatroomMeta.otherUserLastSeenAt ??
+        null,
+    };
+  }, [activeChatroomMeta, isGroupChat, otherUserPresence]);
 
   const handleMessageSent = useCallback(
     (message: MessageEdge) => {
@@ -164,7 +203,7 @@ export default function MessagePage({ params }: PageProps) {
     openFilePicker,
   } = useMessageComposer({
     chatroomId,
-    otherUserId: id,
+    otherUserId: directUserId ?? id,
     currentUserId: user?.id ?? null,
     isGroupChat,
     isSending: sending,
@@ -192,13 +231,25 @@ export default function MessagePage({ params }: PageProps) {
   }, [pendingMessage, uploadProgress]);
 
   useEffect(() => {
-    if (chatroomMeta?.id) {
-      setSelectedChatroomMeta(chatroomMeta);
+    if (!headerMeta?.id) {
+      return;
     }
-  }, [chatroomMeta, setSelectedChatroomMeta]);
+
+    if (
+      selectedChatroomMeta &&
+      selectedChatroomMeta.id === headerMeta.id &&
+      selectedChatroomMeta.isOnline === headerMeta.isOnline &&
+      selectedChatroomMeta.lastSeenAt === headerMeta.lastSeenAt
+    ) {
+      return;
+    }
+
+    setSelectedChatroomMeta(headerMeta);
+  }, [headerMeta, selectedChatroomMeta, setSelectedChatroomMeta]);
 
   const detailChatroomId = chatroomId ?? (isGroupChat ? id : null);
-  const detailOtherUserId = isGroupChat ? undefined : id;
+  const detailOtherUserId = isGroupChat ? undefined : directUserId ?? id;
+  const headerProps = headerMeta ?? activeChatroomMeta ?? null;
 
   useEffect(() => {
     if (loading) return;
@@ -254,12 +305,12 @@ export default function MessagePage({ params }: PageProps) {
         <div className="sticky top-0 z-20 border-b border-white/10 bg-gray-900/95 backdrop-blur">
           {loading ? (
             <ChatHeaderSkeleton />
-          ) : (
+          ) : headerProps ? (
             <ChatHeader
-              {...activeChatroomMeta}
+              {...headerProps}
               onShowDetail={() => setDetailOpen(true)}
             />
-          )}
+          ) : null}
         </div>
         <div ref={scrollContainerRef} className="flex flex-1  scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 overflow-y-scroll  flex-col">
           <div
@@ -445,7 +496,7 @@ export default function MessagePage({ params }: PageProps) {
         onOpenChange={setDetailOpen}
         chatroomId={detailChatroomId}
         otherUserId={detailOtherUserId}
-        meta={activeChatroomMeta}
+        meta={headerProps ?? undefined}
       />
     </div>
   );

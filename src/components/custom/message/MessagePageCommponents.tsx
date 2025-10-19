@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DEFAULT_AVATAR, MessageEdge } from "@/lib/types";
 import { Info } from "lucide-react";
-import { formatEditedTime, formatTime } from "@/lib/utils";
+import { formatEditedTime, formatRelative, formatTime } from "@/lib/utils";
 import clsx from "clsx";
 import Image from "next/image";
 import { MessageImageModal } from "@/components/modal/MessageImageModal";
@@ -94,6 +94,8 @@ export const ChatHeader = ({
   subtitle,
   onShowDetail,
   disableDetailButton = false,
+  isOnline,
+  lastSeenAt,
 }: {
   isGroup: boolean;
   name: string;
@@ -101,6 +103,8 @@ export const ChatHeader = ({
   subtitle?: string | null;
   onShowDetail?: () => void;
   disableDetailButton?: boolean;
+  isOnline?: boolean;
+  lastSeenAt?: string | null;
 }) => (
   <div className="flex items-center justify-between gap-4 border-b border-white/10 bg-white/5 px-8 py-6 backdrop-blur">
     <div className="flex items-center gap-4">
@@ -112,10 +116,21 @@ export const ChatHeader = ({
           sizes="64px"
           className="object-cover"
         />
+        {!isGroup && isOnline && (
+          <span className="absolute bottom-1 right-1 h-3 w-3 rounded-full border border-gray-900 bg-emerald-400" />
+        )}
       </div>
       <div>
         <h2 className="text-2xl font-semibold text-white">{name}</h2>
-        <p className="text-sm text-white/60">{isGroup ? "Group chat" : subtitle ?? "Direct message"}</p>
+        <p className="text-sm text-white/60">
+          {isGroup
+            ? subtitle ?? "Group chat"
+            : isOnline
+            ? "Online now"
+            : lastSeenAt
+            ? `Last seen ${formatRelative(lastSeenAt)}`
+            : subtitle ?? "Offline"}
+        </p>
       </div>
     </div>
     {onShowDetail && (

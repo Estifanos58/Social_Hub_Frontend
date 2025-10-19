@@ -19,6 +19,7 @@ export const GET_USER_CHATROOMS = gql`
             firstname
             lastname
             avatarUrl
+            lastSeenAt
           }
         }
         messages {

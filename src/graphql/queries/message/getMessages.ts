@@ -14,6 +14,7 @@ export const GET_MESSAGES = gql`
         firstname
         lastname
         avatarUrl
+        lastSeenAt
       }
       chatroom {
         id
@@ -27,6 +28,7 @@ export const GET_MESSAGES = gql`
             firstname
             lastname
             avatarUrl
+            lastSeenAt
           }
         }
       }

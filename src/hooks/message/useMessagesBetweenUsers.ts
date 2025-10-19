@@ -130,6 +130,10 @@ export const useMessagesBetweenUsers = ({
         name: 'Conversation',
         avatarUrl: DEFAULT_AVATAR,
         subtitle: null,
+        otherUserId: null,
+        otherUserLastSeenAt: null,
+        isOnline: undefined,
+        lastSeenAt: null,
       };
     }
 
@@ -140,6 +144,10 @@ export const useMessagesBetweenUsers = ({
         name: chatroom.name || 'Group chat',
         avatarUrl: chatroom.avatarUrl || DEFAULT_AVATAR,
         subtitle: `${chatroom.memberships?.length ?? 0} participants`,
+        otherUserId: null,
+        otherUserLastSeenAt: null,
+        isOnline: undefined,
+        lastSeenAt: null,
       };
     }
 
@@ -154,6 +162,10 @@ export const useMessagesBetweenUsers = ({
       name: otherUser?.firstname ?? 'Direct chat',
       avatarUrl: otherUser?.avatarUrl || DEFAULT_AVATAR,
       subtitle: otherUser?.lastname ?? null,
+      otherUserId: otherUser?.id ?? null,
+      otherUserLastSeenAt: otherUser?.lastSeenAt ?? null,
+      isOnline: undefined,
+      lastSeenAt: otherUser?.lastSeenAt ?? null,
     };
   }, [sortedMessages, currentUserId]);
 

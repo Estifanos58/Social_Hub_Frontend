@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ import { formatRelative } from "@/lib/utils";
 import { ChatroomMeta, ChatroomListItem, DEFAULT_AVATAR } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { CreateGroupModal } from "../../../modal/CreateGroupModal";
+import { useUserPresence } from "@/hooks/message/useUserPresence";
 
 
 interface MessagePopUpProps {
@@ -31,6 +32,25 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
   const [isCreateGroupOpen, setCreateGroupOpen] = useState(false);
   const { isMobile } = useGeneralStore();
 
+  const directUserIds = useMemo(
+    () =>
+      chatrooms
+        .filter((room) => !room.isGroup && room.otherUserId)
+        .map((room) => room.otherUserId as string),
+    [chatrooms],
+  );
+
+  const initialLastSeen = useMemo(() => {
+    const snapshot: Record<string, string | null> = {};
+    chatrooms.forEach((room) => {
+      if (room.isGroup || !room.otherUserId) return;
+      snapshot[room.otherUserId] = room.otherUserLastSeenAt ?? null;
+    });
+    return snapshot;
+  }, [chatrooms]);
+
+  const presence = useUserPresence({ userIds: directUserIds, initialLastSeen });
+
   const toChatroomMeta = useCallback(
     (room: ChatroomListItem | undefined): ChatroomMeta | null => {
       if (!room) return null;
@@ -40,6 +60,10 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
         name: room.name,
         avatarUrl: room.avatarUrl ?? DEFAULT_AVATAR,
         subtitle: room.isGroup ? "Group chat" : "Direct message",
+        otherUserId: room.otherUserId ?? null,
+        otherUserLastSeenAt: room.otherUserLastSeenAt ?? null,
+        isOnline: undefined,
+        lastSeenAt: room.otherUserLastSeenAt ?? null,
       };
     },
     [],
@@ -48,7 +72,25 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
   const handleOpenChatroom = useCallback(
     (chatroomId: string, routeId: string, meta?: ChatroomMeta | null) => {
       setSelectedChatRoomId(chatroomId);
-      const resolvedMeta = meta ?? toChatroomMeta(chatrooms.find((room) => room.id === chatroomId));
+      const baseRoom = chatrooms.find((room) => room.id === chatroomId);
+      let resolvedMeta = meta ?? toChatroomMeta(baseRoom);
+
+      if (resolvedMeta && !resolvedMeta.isGroup) {
+        const otherId = resolvedMeta.otherUserId ?? baseRoom?.otherUserId ?? null;
+        const presenceState = otherId ? presence[otherId] : undefined;
+        resolvedMeta = {
+          ...resolvedMeta,
+          otherUserId: otherId,
+          otherUserLastSeenAt: baseRoom?.otherUserLastSeenAt ?? resolvedMeta.otherUserLastSeenAt ?? null,
+          isOnline: presenceState?.isOnline ?? resolvedMeta.isOnline ?? false,
+          lastSeenAt:
+            presenceState?.lastSeenAt ??
+            resolvedMeta.lastSeenAt ??
+            baseRoom?.otherUserLastSeenAt ??
+            null,
+        };
+      }
+
       if (resolvedMeta) {
         setSelectedChatroomMeta(resolvedMeta);
       }
@@ -61,7 +103,7 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
       }
       router.push(`/message/${routeId}`);
     },
-    [chatrooms, isMobile, router, setIsCollapsed, setSelectedChatRoomId, setSelectedChatroomMeta, setShowPopup, toChatroomMeta],
+    [chatrooms, isMobile, presence, router, setIsCollapsed, setSelectedChatRoomId, setSelectedChatroomMeta, setShowPopup, toChatroomMeta],
   );
 
   const handleGroupCreated = useCallback(
@@ -142,6 +184,12 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
                   ? formatRelative(lastMessage.createdAt)
                   : "";
                 const chatroomMeta = toChatroomMeta(chatroom);
+                const isDirect = !chatroom.isGroup;
+                const otherUserId = isDirect ? chatroom.otherUserId ?? null : null;
+                const presenceState = otherUserId ? presence[otherUserId] : undefined;
+                const isOnline = Boolean(presenceState?.isOnline);
+                const lastSeen = presenceState?.lastSeenAt ?? chatroom.otherUserLastSeenAt ?? null;
+                const lastSeenLabel = !isOnline && lastSeen ? formatRelative(lastSeen) : null;
 
                 return (
                   <button
@@ -151,15 +199,25 @@ function MessagePopUp({ setShowPopup, setIsCollapsed }: MessagePopUpProps) {
                     className="flex w-full items-center justify-between rounded-lg bg-gray-900/40 p-3 text-left transition hover:bg-gray-700"
                   >
                     <div className="flex items-center gap-3">
-                      <Image
-                        src={chatroom.avatarUrl}
-                        alt={chatroom.name}
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
+                      <div className="relative h-10 w-10">
+                        <Image
+                          src={chatroom.avatarUrl}
+                          alt={chatroom.name}
+                          width={40}
+                          height={40}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                        {isDirect && isOnline && (
+                          <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-gray-900 bg-emerald-400" />
+                        )}
+                      </div>
                       <div>
                         <p className="text-sm font-semibold text-white">{chatroom.name}</p>
+                        {isDirect && (
+                          <p className="text-[11px] font-medium text-emerald-400/90">
+                            {isOnline ? "Online now" : lastSeenLabel ? `Last seen ${lastSeenLabel}` : "Offline"}
+                          </p>
+                        )}
                         <p className="line-clamp-1 text-xs text-gray-400">{lastMessagePreview}</p>
                       </div>
                     </div>
